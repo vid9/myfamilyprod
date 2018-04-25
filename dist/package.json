@@ -1,6 +1,6 @@
 {
   "name": "ekosmart",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "test app",
   "main": "app.js",
   "dependencies": {
@@ -56,7 +56,6 @@
     "run-sequence": "^2.2.1"
   },
   "scripts": {
-	"install": "npm install",
     "start": "node prod.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
