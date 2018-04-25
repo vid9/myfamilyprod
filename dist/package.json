@@ -56,13 +56,13 @@
     "run-sequence": "^2.2.1"
   },
   "scripts": {
-	"install": "npm install"
+	"install": "npm install",
     "start": "node prod.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/juretrilar/myfamily.git"
+    "url": "https://github.com/vid9/myfamilyprod.git"
   },
   "author": "vid9",
   "license": "ISC"
