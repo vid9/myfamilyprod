@@ -56,7 +56,8 @@
     "run-sequence": "^2.2.1"
   },
   "scripts": {
-    "start": "node app.js",
+	"install": "npm install"
+    "start": "node prod.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
