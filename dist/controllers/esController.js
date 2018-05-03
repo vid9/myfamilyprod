@@ -137,7 +137,7 @@ module.exports.naslovnaStran = function (req, res) {
             let temp = [];
             for (let j=0; j<result.cilji[i].vezani_uporabniki.length;j++) {
                 let usr = result.uporabniki.find(x => x.id == result.cilji[i].vezani_uporabniki[j].id_user);
-                temp.push(usr.slika);
+                if(usr) temp.push(usr.slika);                
             }
             if(result.cilji[i].skupni_cilj == true) {
                 sCilji.push({ime: result.cilji[i].ime, opis: result.cilji[i].opis, vezani_uporabniki: result.cilji[i].vezani_uporabniki, xp: result.cilji[i].xp});
