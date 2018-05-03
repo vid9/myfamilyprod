@@ -19,7 +19,7 @@ let CronJob = require('cron').CronJob;
 let nodemailer = require('nodemailer');
 let shortId = require('short-mongo-id');
 
-let color = {"5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5a785157425a883c30b08b7a": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3"};
+let color = {"5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5aeabcd8be609116280b4d9c": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3"};
 
 let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
@@ -48,6 +48,9 @@ function vrniNapako(res, err){
 
 //** GET /
 module.exports.naslovnaStran = function (req, res) {
+    let di="5aeabcd8be609116280b4d9c"
+    console.log(di, shortId(di));
+
     if (checkIfLogged(res, req) != 0) return;    
     let opomnik = [];
     let obj = {monthly: []};
@@ -374,7 +377,7 @@ module.exports.prikaziKoledar = function(req, res, next) {
         return queryKategorija({_id: naloge[0].kategorija}, {}).then(function(kategorija) {
             naloge[0].vezani_uporabniki.unshift(naloge[0].avtor);
             return queryUporabniki({_id: naloge[0].vezani_uporabniki}, {slika: 1, ime: 1}).then(function(users) {
-                res.render("pages/nalogakoledar", {naloge: naloge, moment : moment, kategorija : kategorija[0].ime, vezani: users});
+                res.render("pages/nalogakoledar", {naloge: naloge, moment : moment, kategorija : kategorija[0].ime, vezani: users, shortId: shortId});
             }).catch(err => {
                 return vrniNapako(res, err);
             });
