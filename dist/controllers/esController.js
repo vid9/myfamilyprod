@@ -368,14 +368,17 @@ module.exports.posodobiObvestila = function(req, res, next) {
     });   
 };
 
-//** POST /koledar/:koledarId
+//** GET /koledar/:koledarId
 module.exports.prikaziKoledar = function(req, res, next) {
     if (checkIfLogged(res, req) != 0) return;  
     currentTab = 1;
     return queryNaloge({_id: req.params.koledarId}, {}).then(function(naloge) {
+        console.log(naloge);
         return queryKategorija({_id: naloge[0].kategorija}, {}).then(function(kategorija) {
             naloge[0].vezani_uporabniki.unshift(naloge[0].avtor);
+            console.log(kategorija);
             return queryUporabniki({_id: naloge[0].vezani_uporabniki}, {slika: 1, ime: 1}).then(function(users) {
+                console.log(users);
                 res.render("pages/nalogakoledar", {naloge: naloge, moment : moment, kategorija : kategorija[0].ime, vezani: users, shortId: shortId});
             }).catch(err => {
                 return vrniNapako(res, err);
@@ -568,7 +571,7 @@ module.exports.ustvariCilj = function(req, res, next) {
         maxXp: req.body.xpNaloge,
         druzina: mongoose.Types.ObjectId(req.session.trenutniUporabnik.druzina)
     };
-    let conditions = { _id : new mongoose.mongo.ObjectId() };
+    let conditions = { _id : mongoose.Types.ObjectId() };
     if(req.body.newDialog) {
         conditions = { _id: req.body.newDialog };
         if(req.body.stanje) {
