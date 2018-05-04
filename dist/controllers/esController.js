@@ -374,9 +374,10 @@ module.exports.prikaziKoledar = function(req, res, next) {
     currentTab = 1;
     return queryNaloge({_id: req.params.koledarId}, {}).then(function(naloge) {
         console.log(naloge);
-        return queryKategorija({_id: naloge[0].kategorija}, {}).then(function(kategorija) {
+        return queryKategorija({_id: naloge[0].kategorija}, {ime: 1}).then(function(kategorija) {
             naloge[0].vezani_uporabniki.unshift(naloge[0].avtor);
-            console.log(kategorija);
+            console.log(naloge[0].kategorija);
+            console.log(kategorija[0].ime);
             return queryUporabniki({_id: naloge[0].vezani_uporabniki}, {slika: 1, ime: 1}).then(function(users) {
                 console.log(users);
                 res.render("pages/nalogakoledar", {naloge: naloge, moment : moment, kategorija : kategorija[0].ime, vezani: users, shortId: shortId});
@@ -512,7 +513,7 @@ module.exports.ustvariNalogo = function(req, res, next) {
                         //console.log(doc, "doc");
                         //console.log(doc._id, "id");
 
-                        let nalId = doc._id;
+                        let nalId = conditions._id;
                         if(req.body.newDialog) nalId = req.body.newDialog;
                         if (obj) {
                             let index = obj.indexOf(nalId);
