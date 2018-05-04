@@ -481,7 +481,7 @@ module.exports.ustvariNalogo = function(req, res, next) {
             //
     if(req.body.dateZacetek == "") novaNaloga.zacetek = dateNow();
     if(req.body.dateKonec == "") novaNaloga.konec = novaNaloga.zacetek;
-    let conditions = { _id: req.body.newDialog ? req.body.newDialog : null};
+    let conditions = { _id: req.body.newDialog ? req.body.newDialog : mongoose.Types.ObjectId()};
     Naloge.findOneAndUpdate(conditions, novaNaloga,{upsert: true, runVlidators: true, returnNewDocument: true}, function (err, doc) { // callback
         if (err) {
             res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
