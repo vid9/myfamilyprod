@@ -270,6 +270,7 @@ module.exports.posodobiOsebnePodatke = function(req, res, next) {
             console.log(err);
             vrniNapako(res, err);
         } else {
+            currSession.trenutniUporabnik.vrsta = parseInt(req.body.izbranaVrsta);
             res.redirect('/')
         }
     });
