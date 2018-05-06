@@ -374,12 +374,14 @@ module.exports.prikaziKoledar = function(req, res, next) {
     currentTab = 1;
     return queryNaloge({_id: req.params.koledarId}, {}).then(function(naloge) {
         //console.log(naloge);
-        return queryKategorija({_id: naloge[0].kategorija}, {}).then(function(kategorija) {
+        return queryKategorija({_id: mongoose.Types.ObjectId(naloge[0].kategorija)}, {ime: 1}).then(function(kategorija) {
             naloge[0].vezani_uporabniki.unshift(naloge[0].avtor);
             console.log(naloge[0].kategorija);
             console.log(kategorija);
             console.log(kategorija[0]);
             console.log(kategorija[0].ime);
+            
+            
             return queryUporabniki({_id: naloge[0].vezani_uporabniki}, {slika: 1, ime: 1}).then(function(users) {
                 console.log(users);
                 res.render("pages/nalogakoledar", {naloge: naloge, moment : moment, kategorija : kategorija[0].ime, vezani: users, shortId: shortId});
@@ -787,6 +789,7 @@ function queryKategorija(query, fields) {
     return new Promise(function(resolve, reject) {
         Kategorija.find(query, fields, function(err, result){
             if (err) {
+                console.log(err);
                 throw err;
                 reject(err);
             }
