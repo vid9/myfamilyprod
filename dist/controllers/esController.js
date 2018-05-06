@@ -380,7 +380,7 @@ module.exports.prikaziKoledar = function(req, res, next) {
             console.log(kategorija);
 			console.log()
             console.log(kategorija[0]);
-            console.log(kategorija[0].ime);
+
             
             
             return queryUporabniki({_id: naloge[0].vezani_uporabniki}, {slika: 1, ime: 1}).then(function(users) {
@@ -790,8 +790,7 @@ function queryKategorija(query, fields) {
     return new Promise(function(resolve, reject) {
         Kategorija.find(query, fields, function(err, result){
             if (err) {
-                console.log(err);
-				console.log("this is not working");
+                console.log(err, "this is not working");
                 throw err;
                 reject(err);
             }
