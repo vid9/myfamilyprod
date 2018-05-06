@@ -19,7 +19,7 @@ let CronJob = require('cron').CronJob;
 let nodemailer = require('nodemailer');
 let shortId = require('short-mongo-id');
 
-let color = {"5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5aeabcd8be609116280b4d9c": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3"};
+let color = {"5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5aeabcd8be609116280b4d9c": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3", "5aef78ab361f5244948ff58f" : "#96ECED"};
 let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 let currentTab = 0;
@@ -47,6 +47,8 @@ function vrniNapako(res, err){
 
 //** GET /
 module.exports.naslovnaStran = function (req, res) {
+    let t = mongoose.Types.ObjectId();
+    console.log(t, shortId(t));
     if (checkIfLogged(res, req) != 0) return;    
     let opomnik = [];
     let obj = {monthly: []};
@@ -375,17 +377,10 @@ module.exports.prikaziKoledar = function(req, res, next) {
     return queryNaloge({_id: req.params.koledarId}, {}).then(function(naloge) {
         //console.log(naloge);
         return queryKategorija({_id: mongoose.Types.ObjectId(naloge[0].kategorija)}, {ime: 1}).then(function(kategorija) {
-            naloge[0].vezani_uporabniki.unshift(naloge[0].avtor);
-            console.log(naloge[0].kategorija);
-            console.log(kategorija);
-			console.log()
-            console.log(kategorija[0]);
-
-            
-            
+            naloge[0].vezani_uporabniki.unshift(naloge[0].avtor);            
             return queryUporabniki({_id: naloge[0].vezani_uporabniki}, {slika: 1, ime: 1}).then(function(users) {
                 console.log(users);
-                res.render("pages/nalogakoledar", {naloge: naloge, moment : moment, kategorija : "Ne dela", vezani: users, shortId: shortId});
+                res.render("pages/nalogakoledar", {naloge: naloge, moment : moment, kategorija : kategorija[0].ime, vezani: users, shortId: shortId});
             }).catch(err => {
                 return vrniNapako(res, err);
             });
@@ -790,7 +785,6 @@ function queryKategorija(query, fields) {
     return new Promise(function(resolve, reject) {
         Kategorija.find(query, fields, function(err, result){
             if (err) {
-                console.log(err, "this is not working");
                 throw err;
                 reject(err);
             }
