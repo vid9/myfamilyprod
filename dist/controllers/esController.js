@@ -20,7 +20,6 @@ let nodemailer = require('nodemailer');
 let shortId = require('short-mongo-id');
 
 let color = {"5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5aeabcd8be609116280b4d9c": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3"};
-
 let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 let currentTab = 0;
@@ -494,7 +493,6 @@ module.exports.ustvariNalogo = function(req, res, next) {
         } else {
             //Iščem cilj, pod katerega je bila dodana naloga, uporabnikom prištejem vrednost za naloge, ki so jih naredili
             if(vCilj) {
-                console.log("slo not");
                 Cilji.findOne({_id: req.body.sampleCilj}, function(err, cilj) {
                     if(!err) {
                         let obj = cilj.vezani_uporabniki.map(value => String(value.id_user));
@@ -503,7 +501,7 @@ module.exports.ustvariNalogo = function(req, res, next) {
                             let index = obj.indexOf(String(novaNaloga.vezani_uporabniki[i]));
                             if (index > -1) {
                                 //prištejem točke
-                                cilj.vezani_uporabniki[index].xp_user += currXp;
+                                cilj.vezani_uporabniki[index].xp_user += parseInt(currXp);
                             } else {
                                 //Če uporabnik še ni v cilju, ga dodam
                                 cilj.vezani_uporabniki.push({"id_user" : novaNaloga.vezani_uporabniki[i], "xp_user" : currXp});
@@ -608,7 +606,7 @@ module.exports.povabiUporabnika = function (req, res, next) {
     console.log("sending mail");
     mailOptions.html = '<p><h1>Pozdravljen!</h1>Vabim te, da se mi pridužiš kot član družine v aplikaciji MyFamily. Najprej se registriraj na '+
     '<a href="https://ekosmartweb.herokuapp.com/prijava">spletni strani</a>, nato se prijavi v aplikacijo in klikni na spodnjo povezavo.<br/><br/>'+
-    '<a href="https://ekosmartweb.herokuapp.com/invite/'+req.session.trenutniUporabnik.druzina+'">'+
+    '<a href="https://ekosmartweb.herokuapp.com/api/'+req.session.trenutniUporabnik.druzina+'">'+
     'Pridruži se družini</a><br/><br/>Po uspešni včlanitvi si izberi svojo vlogo v družini. Najdeš jo v zgornjem desnem meniju pod možnostjo Osebne nastavitve.'+
     '<br/><br/>Lep pozdrav,<br/>'+req.session.trenutniUporabnik.ime+'</p>';
     console.log(mailOptions.html);
