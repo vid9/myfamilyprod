@@ -163,7 +163,7 @@ module.exports.naslovnaStran = function (req, res) {
             
             let vcilj =  result.cilji.find(x => x.id == opomnik[i].vezan_cilj);
             console.log(vcilj);
-            opomnik[i].vezan_cilj = vcilj.ime;
+            if (vcilj) opomnik[i].vezan_cilj = vcilj.ime;            
         }            
         posodobiJson(obj, req.session);
         res.render("pages/index", {uporabniki : result.uporabniki, currSession : req.session, cilji : result.cilji, tab : currentTab, kategorija : result.kategorija, id : req.session.trenutniUporabnik.id, opomniki: opomnik, skupniCilji: sCilji,  moment : moment});
