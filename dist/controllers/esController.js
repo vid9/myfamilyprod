@@ -272,7 +272,7 @@ module.exports.posodobiOsebnePodatke = function(req, res, next) {
             console.log(err);
             vrniNapako(res, err);
         } else {
-            currSession.trenutniUporabnik.vrsta = parseInt(req.body.izbranaVrsta);
+            req.session.trenutniUporabnik.vrsta = parseInt(req.body.izbranaVrsta);
             res.redirect('/')
         }
     });
@@ -605,7 +605,7 @@ module.exports.povabiUporabnika = function (req, res, next) {
     };
 
     console.log("sending mail");
-    mailOptions.html = '<p><h1>Pozdravljen!</h1>Vabim te, da se mi pridužiš kot član družine v aplikaciji MyFamily. Najprej se registriraj na '+
+    mailOptions.html = '<p><h1>Pozdravljen!</h1>Vabim te, da se mi pridužiš kot član družine v aplikaciji MyFamily.<br/><br/>Najprej se registriraj na '+
     '<a href="https://ekosmartweb.herokuapp.com/prijava">spletni strani</a>, nato se prijavi v aplikacijo in klikni na spodnjo povezavo.<br/><br/>'+
     '<a href="https://ekosmartweb.herokuapp.com/api/'+req.session.trenutniUporabnik.druzina+'">'+
     'Pridruži se družini</a><br/><br/>Po uspešni včlanitvi si izberi svojo vlogo v družini. Najdeš jo v zgornjem desnem meniju pod možnostjo Osebne nastavitve.'+
