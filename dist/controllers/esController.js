@@ -401,7 +401,7 @@ module.exports.prikaziNaloge = function(req, res, next) {
     if (req.body.avtor) where_search.avtor =  req.body.avtor;
     if (req.body.kategorija) where_search.kategorija = req.body.kategorija;
     if (req.body.status) where_search.status = (req.body.status == 'true');
-    if (req.body.cilj) where_search.cilj = req.body.cilj;
+    if (req.body.cilj) where_search.vezan_cilj = req.body.cilj;
     if (req.body.oseba) where_search.vezani_uporabniki = req.body.oseba;
     if (req.body.koledar) {
         if (req.body.koledar == "Da") {
@@ -410,6 +410,7 @@ module.exports.prikaziNaloge = function(req, res, next) {
             where_search.zacetek = null;
         }
     }
+    console.log(where_search);
     async.parallel({
         docs: function (cb) { Naloge.find(where_search).exec(cb);},
         kategorija: function (cb) { Kategorija.find().exec(cb); },
@@ -420,6 +421,7 @@ module.exports.prikaziNaloge = function(req, res, next) {
         if (err) {
             return vrniNapako(err,res);
         }
+        console.log(results.docs);
         let kat = {},usr = {};
         for(let i=0;i<results.kategorija.length;i++) {
             kat[results.kategorija[i].id] = results.kategorija[i].ime;
