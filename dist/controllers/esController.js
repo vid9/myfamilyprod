@@ -19,7 +19,7 @@ let CronJob = require('cron').CronJob;
 let nodemailer = require('nodemailer');
 let shortId = require('short-mongo-id');
 
-let color = {"5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5aeabcd8be609116280b4d9c": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3", "5aef78ab361f5244948ff58f" : "#96ECED"};
+let color = {"5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5aeabcd8be609116280b4d9c": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3", "5aef78ab361f5244948ff58f" : "#a3f7bf"};
 let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 let currentTab = 0;
