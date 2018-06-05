@@ -194,6 +194,7 @@ module.exports.prijava = function (req, res, next) {
 module.exports.prijaviUporabnika = function (req, res, next) {
     let email = req.body.email;
     let geslo = hash(req.body.password);
+    console.log(hash(req.body.password));
     Uporabnik.find(function (err, uporabniki) {
         if (err) {
             console.log(err);
@@ -231,9 +232,8 @@ module.exports.prijaviUporabnika = function (req, res, next) {
                     break;
                 }
             }
-            //console.log(req.session.trenutniUporabnik);
+            console.log(req.session.trenutniUporabnik);
             if (req.session.trenutniUporabnik) {
-                console.log(req.session.trenutniUporabnik);
                 res.redirect("/");
             } else {
                 res.render("pages/prijava", { sporociloPrijava: "Napačen e-mail in/ali geslo!", uporabnik: "", currSession: "" });
@@ -294,8 +294,16 @@ module.exports.posodobiOsebnePodatke = function (req, res, next) {
 module.exports.posodobiObvestila = function (req, res, next) {
     if (checkIfLogged(res, req) != 0) return;
     let mail = false, tel = false;
-    if (req.body.switchMail) mail = true;
-    if (req.body.switchSms) tel = true;
+    req.session.trenutniUporabnik.notf_email = false;
+    req.session.trenutniUporabnik.notf_telefon = false;
+    if (req.body.switchMail) {
+        mail = true;
+        req.session.trenutniUporabnik.notf_email = true;
+    }
+    if (req.body.switchSms) {
+        tel = true;
+        req.session.trenutniUporabnik.notf_telefon = true;
+    }
     let conditions = { _id: req.session.trenutniUporabnik.id };
     Uporabnik.find(conditions, { notf_telefon: 1, notf_email: 1 }).then(notif => {
         let updateUporabnik = {};        
@@ -303,26 +311,53 @@ module.exports.posodobiObvestila = function (req, res, next) {
             updateUporabnik.notf_telefon = tel;        
             if (tel == true) {
                 if (jobs[req.session.trenutniUporabnik.id + "sms"]) {
-                    req.session.trenutniUporabnik.notf_telefon = false;
                     jobs[req.session.trenutniUporabnik.id + "sms"].start();
                 } else {
                     jobs[req.session.trenutniUporabnik.id + "sms"] = new CronJob({
                         cronTime: '00 00 00 * * *',
                         onTick: function () {
-                            let name = "MyFamily";
-                            let number = req.session.trenutniUporabnik.telefon; //user number
-                            let text = "Današnji dan: 12:00 Pospravi smeti, Odnesi smeti, Fizična aktivnost 19:00 - 20:30";
-                            sendMessage(name, number, text);
-                            /* Runs every day (Monday through Sunday) */
+                            Naloge.find({ vezani_uporabniki: mongoose.Types.ObjectId(this.jobName) }, function (err, naloga) {
+                                if (err) {
+                                    throw err;
+                                    return;
+                                }
+                                let temp = [];
+                                if (naloga.length == 0) {
+                                } else {
+                                    for (let i = 0; i < naloga.length; i++) {
+                                        let zac = moment(naloga[i].zacetek).format('MM-DD-YYYY');
+                                        let kon = moment(naloga[i].konec).format('MM-DD-YYYY');
+                                        let now = moment(Date.now()).format('MM-DD-YYYY');
+                                        if (dateCheck(zac,kon,now) && naloga[i].status == false) { // Če naloga neopravljena jo dodaj med opomnike
+                                            temp.push({
+                                                ime: naloga[i].ime,
+                                                opis: naloga[i].opis,
+                                                zacetek: naloga[i].zacetek,
+                                                konec: naloga[i].konec,
+                                                xp: naloga[i].xp,
+                                            });
+                                        }
+                                    }
+                                    if (temp && once == 0) {
+                                        once = 1;                                
+                                        let vsebina = 'Današnji opomniki:\n\n';
+                                        for (i=0;i<temp.length;i++) {
+                                            vsebina += "Ime: "+temp[i].ime+"\nOpis: "+temp[i].opis+"\nZačetek: "+moment(temp[i].zacetek).format("D. M ob H:m")+
+                                            "\nKonec: "+moment(temp[i].konec).format("D. M ob H:m")+"\nTočk: "+temp[i].xp+"\n\n";
+                                        }
+                                        let name = "MyFamily opomnik";
+                                        sendMessage(name, this.number, vsebina);
+                                    }
+                                }
+                            });
                         },
                         start: true,
                         timeZone,
-                        context: { jobName: req.session.trenutniUporabnik.id }
+                        context: { jobName: req.session.trenutniUporabnik.id, number: req.session.trenutniUporabnik.telefon, }
                     });
                 }
             } else {
                 if (jobs[req.session.trenutniUporabnik.id + "sms"]) {
-                    req.session.trenutniUporabnik.notf_telefon = false;
                     jobs[req.session.trenutniUporabnik.id + "sms"].stop();
                 }
             }
@@ -331,40 +366,59 @@ module.exports.posodobiObvestila = function (req, res, next) {
             updateUporabnik.notf_email = mail;         
             if (mail == true) {
                 if (jobs[req.session.trenutniUporabnik.id + "email"]) {
-                    req.session.trenutniUporabnik.notf_email = true;
                     jobs[req.session.trenutniUporabnik.id + "email"].start();
                 } else {
                     jobs[req.session.trenutniUporabnik.id + "email"] = new CronJob({
                         cronTime: "* * * * *",
                         onTick: function () {
-                            console.log("cron");
-                            let temp = textOpomnik(this.jobName);
-                            console.log("temp", temp);
-                            if (temp && once == 0) {
-                                console.log("what")
-                                once = 1;                                
-                                let vsebina = 'Današnji opomniki:\n\n';
-                                for (i=0;i<temp.length;i++) {
-                                    vsebina += "Ime: "+temp[i].ime+"\nOpis: "+temp[i].opis+"\nZačetek: "+moment(temp[i].zacetek).format("D. M H:m")+
-                                    "\nKonec: "+moment(temp[i].konec).format("D. M H:m")+"\nTočk: "+temp[i].xp+"\n\n";
+                            Naloge.find({ vezani_uporabniki: mongoose.Types.ObjectId(this.jobName) }, function (err, naloga) {
+                                if (err) {
+                                    throw err;
+                                    return;
                                 }
-                                console.log("setting options");
-                                mailOptions = {
-                                    from: '"MyFamily mailer"'+process.env.mailUser,
-                                    to: '"Usr"'+process.env.testMail,
-                                    subject: "Opomnik " + moment(new Date()).format('M. D'),
-                                    text: vsebina,
-                                }
-                                console.log(mailOptions);
-                                console.log("Sending mail");
-                                transporter.sendMail(mailOptions, function (error, info) {
-                                    if (error) {
-                                        console.log(error);
-                                    } else {
-                                        console.log('Email sent: ' + info.response);
+                                let temp = [];
+                                if (naloga.length == 0) {
+                                } else {
+                                    for (let i = 0; i < naloga.length; i++) {
+                                        let zac = moment(naloga[i].zacetek).format('MM-DD-YYYY');
+                                        let kon = moment(naloga[i].konec).format('MM-DD-YYYY');
+                                        let now = moment(Date.now()).format('MM-DD-YYYY');
+                                        if (dateCheck(zac,kon,now) && naloga[i].status == false) { // Če naloga neopravljena jo dodaj med opomnike
+                                            temp.push({
+                                                ime: naloga[i].ime,
+                                                opis: naloga[i].opis,
+                                                zacetek: naloga[i].zacetek,
+                                                konec: naloga[i].konec,
+                                                xp: naloga[i].xp,
+                                            });
+                                        }
                                     }
-                                });
-                            }
+                                    if (temp && once == 0) {
+                                        once = 1;                                
+                                        let vsebina = 'Današnji opomniki:\n\n';
+                                        for (i=0;i<temp.length;i++) {
+                                            vsebina += "Ime: "+temp[i].ime+"\nOpis: "+temp[i].opis+"\nZačetek: "+moment(temp[i].zacetek).format("D. M ob H:m")+
+                                            "\nKonec: "+moment(temp[i].konec).format("D. M ob H:m")+"\nTočk: "+temp[i].xp+"\n\n";
+                                        }
+                                        console.log("setting options");
+                                        mailOptions = {
+                                            from: '"MyFamily mailer"'+process.env.mailUser,
+                                            to: '"Usr"'+this.eMail,
+                                            subject: "Opomnik " + moment(new Date()).format('M. D'),
+                                            text: vsebina,
+                                        }
+                                        console.log(vsebina);
+                                        console.log("Sending mail");
+                                        transporter.sendMail(mailOptions, function (error, info) {
+                                            if (error) {
+                                                console.log(error);
+                                            } else {
+                                                console.log('Email sent: ' + info.response);
+                                            }
+                                        });
+                                    }
+                                }
+                            });
                         },
                         start: true,
                         context: { jobName: req.session.trenutniUporabnik.id, eMail: req.session.trenutniUporabnik.email}
@@ -372,10 +426,8 @@ module.exports.posodobiObvestila = function (req, res, next) {
                 }
             } else {
                 if (jobs[req.session.trenutniUporabnik.id + "email"]) {
-                    //console.log("job exists");
                     jobs[req.session.trenutniUporabnik.id + "email"].stop();
                 }
-                req.session.trenutniUporabnik.notf_email = false;
             }
         }
         if (updateUporabnik) {
@@ -908,34 +960,3 @@ function hash(inp) {
     }
     return hs;
 };
-
-
-function textOpomnik(id) {
-    let opomnik = [];
-    Naloge.find({ vezani_uporabniki: mongoose.Types.ObjectId(id) }).then(naloga => {
-        if (naloga.length == 0) {
-            return opomnik;
-        }
-        for (let i = 0; i < naloga.length; i++) {
-            let zac = moment(naloga[i].zacetek).format('MM-DD-YYYY');
-            let kon = moment(naloga[i].konec).format('MM-DD-YYYY');
-            let now = moment(Date.now()).format('MM-DD-YYYY');
-            if (zac == now && naloga[i].status == false) { // Če naloga neopravljena jo dodaj med opomnike
-                opomnik.push({
-                    ime: naloga[i].ime,
-                    opis: naloga[i].opis,
-                    zacetek: naloga[i].zacetek,
-                    konec: naloga[i].konec,
-                    xp: naloga[i].xp,
-                });
-                console.log(i, "index");
-            }
-        }
-        return opomnik;
-    }).catch(err => {
-        console.log(err);
-        vrniNapako(res, err);
-        return;
-    });
-    return opomnik;
-}

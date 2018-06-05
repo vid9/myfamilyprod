@@ -6,8 +6,8 @@
                 <h2 class="mdl-card__title-text mdl-color-text--white">Nastavitve sporočanja</h2>
             </div>
             <form method="POST" action="/notifications" id="notif_sms_mail">
-                <div class="mdl-card__supporting-text mdl-grid overflow-visible padding-top-16 middle-align">
-                    
+                <div class="mdl-card__supporting-text mdl-grid overflow-visible padding-top-16"> 
+                    <div class="middle-align">               
                         <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switchSms" name="switchSms" <% if(currSession.trenutniUporabnik.notf_telefon) {  %> checked <% } %>>
                             <input type="checkbox" id="switchSms" class="mdl-switch__input" >
                             <span class="mdl-switch__label">Obveščanje preko SMS sporočil</span>
@@ -21,7 +21,8 @@
                         <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="pushButton">
                             <input disabled type="checkbox" id="pushButton" name="pushButton" class="mdl-switch__input">
                             <span class="mdl-switch__label"><i class="material-icons">notifications</i>Vklopi obvestila v brskalniku</span>
-                        </label>                      
+                        </label>   
+                    </div>                    
                     <!--
                     <div style="padding:20px;">
                             <button disabled id="pushButton" class="js-push-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
