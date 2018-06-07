@@ -599,7 +599,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                 if (index !== -1) arr.splice(index, 1);
                 Subscription.find({ user_id: arr }, function (err, sub) {
                     if (err) {
-                        throw err;
+                        console.log(err);
                         return;
                     }
                     for(let m = 0; m < sub.length;m++) {
@@ -612,7 +612,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                     }
                 });         
             }
-            //Iščem cilj, pod katerega je bila dodana naloga, uporabnikom prištejem vrednost za naloge, ki so jih naredili
+            //Če je naloga prestavljena pod drug cilj, sinhorniziram točke
             if (vCilj) {
                 if (req.body.oldCilj != req.body.sampleCilj) {
                     Cilji.findOne({ _id: req.body.oldCilj }, function (err, cilj) {
@@ -662,10 +662,9 @@ module.exports.ustvariNalogo = function (req, res, next) {
                         }
                     });
                 }
+                //Iščem cilj, pod katerega je bila dodana naloga, uporabnikom prištejem vrednost za naloge, ki so jih naredili
                 Cilji.findOne({ _id: req.body.sampleCilj }, function (err, cilj) {
                     if (!err) {
-                        let temp = 0
-                        if (req.body.newStatus == true) temp = req.body.xpNaloge;
                         let obj = cilj.vezani_uporabniki.map(value => String(value.id_user));
                         if (!obj) obj = {};
                         for (let i = 0; i < novaNaloga.vezani_uporabniki.length; i++) {
@@ -675,10 +674,10 @@ module.exports.ustvariNalogo = function (req, res, next) {
                                 if (req.body.newStatus == true) cilj.vezani_uporabniki[index].xp_user = parseInt(cilj.vezani_uporabniki[index].xp_user) + parseInt(req.body.xpNaloge);
                             } else {
                                 //Če uporabnik še ni v cilju, ga dodam               
-                                cilj.vezani_uporabniki.push({ "id_user": novaNaloga.vezani_uporabniki[i], "xp_user": temp });
+                                cilj.vezani_uporabniki.push({ "id_user": novaNaloga.vezani_uporabniki[i], "xp_user": currXp });
                             }
                         }
-                        cilj.xp = parseInt(cilj.xp) + parseInt(temp);
+                        cilj.xp = parseInt(cilj.xp) + parseInt(currXp);
                         obj = cilj.vezane_naloge.map(value => String(value.id_nal));
                         //console.log(doc, "doc");
                         //console.log(doc._id, "id");
@@ -777,7 +776,7 @@ module.exports.povabiUporabnika = function (req, res, next) {
     };
     mailOptions.html = '<p><h1>Pozdravljen!</h1>Vabim te, da se mi pridužiš kot član družine v aplikaciji MyFamily.<br/><br/>Najprej se registriraj na ' +
         '<a href="https://ekosmartweb.herokuapp.com/prijava">spletni strani</a>, nato se prijavi v aplikacijo in klikni na spodnjo povezavo.<br/><br/>' +
-        '<a href="https://ekosmartweb.herokuapp.com/api/' + req.session.trenutniUporabnik.druzina + '">' +
+        '<a href="https://ekosmartweb.herokuapp.com/change/' + req.session.trenutniUporabnik.druzina + '">' +
         'Pridruži se družini</a><br/><br/>Po uspešni včlanitvi si izberi svojo vlogo v družini. Najdeš jo v zgornjem desnem meniju pod možnostjo Osebne nastavitve.' +
         '<br/><br/>Lep pozdrav,<br/>' + req.session.trenutniUporabnik.ime + '</p>';
     console.log(mailOptions.html);
