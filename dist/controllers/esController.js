@@ -791,6 +791,7 @@ module.exports.ustvariCilj = function (req, res, next) {
         }
     } else {
         novCilj.zacetek = updated;
+        novCilj.xp = 0;
     }
     Cilji.findOneAndUpdate(conditions, novCilj, { upsert: true, runValidators: true }, function (err, doc) { // callback
         if (err) {
