@@ -521,7 +521,7 @@ module.exports.prikaziNaloge = function (req, res, next) {
                 if (ime) { imeCilj.push(ime.ime); }
                 else { imeCilj.push("Samostojna naloga"); }
             }
-            console.log(results.docs);
+            //console.log(results.docs);
             res.render("pages/nalogequery", { naloge: results.docs, moment: moment, kategorija: kat, slika: usr, imeCilj: imeCilj, shortId: shortId });
         });
 };
@@ -577,13 +577,6 @@ module.exports.ustvariNalogo = function (req, res, next) {
             }
         }
     }
-    Uporabnik.update({ _id: { $in: novaNaloga.vezani_uporabniki } }, { $inc: { dayXp: currXp } }, { multi: true }, function (err, docs) {
-        if (err) {
-            console.log(err);
-            res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
-            return;
-        }
-    })
     if (req.body.dateZacetek == "") novaNaloga.zacetek = dateNow();
     if (req.body.dateKonec == "") novaNaloga.konec = novaNaloga.zacetek;
     let conditions = { _id: req.body.newDialog ? req.body.newDialog : mongoose.Types.ObjectId() };
@@ -593,8 +586,51 @@ module.exports.ustvariNalogo = function (req, res, next) {
             res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
             return;
         } else {
+            let o = doc.vezani_uporabniki.map(value => String(value));
+            let c = novaNaloga.vezani_uporabniki.map(value => String(value));
+            let differenceO = o.filter(x => !c.includes(x));   
+            let differenceC = c.filter(x => !o.includes(x)); 
+            console.log(differenceO, differenceC, "@@@@@@@@@@");
+            if(req.body.newStatus == "true" && req.body.oldStatus == "false") {
+                Uporabnik.update({ _id: { $in: novaNaloga.vezani_uporabniki } }, { $inc: { dayXp: req.body.xpNaloge } }, { multi: true }, function (err, docs) {
+                    if (err) {
+                        console.log(err);
+                        res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
+                        return;
+                    }
+                    console.log("Primer 1");
+                });
+            } else if (req.body.newStatus == "true" && req.body.oldStatus == "true") {
+                let dif = [];
+                let pre = 1;
+                if (differenceO.length != 0) { 
+                    dif = differenceO;
+                    pre = -1;
+                    console.log("Primer 2");
+                } else {
+                    dif = differenceC;
+                    pre = 1;
+                    console.log("Primer 2.5");
+                }      
+                Uporabnik.update({ _id: { $in: dif } }, { $inc: { dayXp: req.body.xpNaloge*pre } }, { multi: true }, function (err, docs) {
+                    if (err) {
+                        console.log(err);
+                        res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
+                        return;
+                    }
+                });                      
+            } else if (req.body.newStatus == "false" && req.body.oldStatus == "true" && req.body.newDialog) {
+                Uporabnik.update({ _id: { $in: novaNaloga.vezani_uporabniki } }, { $inc: { dayXp: -req.body.xpNaloge } }, { multi: true }, function (err, docs) {
+                    if (err) {
+                        console.log(err);
+                        res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
+                        return;
+                    }
+                    console.log("Primer 3");
+                }); 
+            }
             if (req.body.mode || req.body.newStatus == true) {
-                console.log(novaNaloga.vezani_uporabniki);
+                //console.log(novaNaloga.vezani_uporabniki);
                 let arr = novaNaloga.vezani_uporabniki;
                 let index = arr.indexOf(req.session.trenutniUporabnik._id);
                 if (index !== -1) arr.splice(index, 1);
