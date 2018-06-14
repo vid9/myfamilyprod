@@ -251,7 +251,7 @@ module.exports.prijaviUporabnika = function (req, res, next) {
 
 //** POST /registracija
 module.exports.ustvariUporabnika = function (req, res, next) {
-    if (!req.body.avatar) req.body.avatar = "public/uploads/default.png";
+    if (!req.body.avatar) req.body.avatar = 0;
     let noviUporabnik = {
         _id: new ObjectId(),
         ime: req.body.reg_name,
@@ -263,7 +263,7 @@ module.exports.ustvariUporabnika = function (req, res, next) {
         notf_telefon: false,
         vrsta: 7,
         admin: false,
-        slika: "" + req.body.avatar,
+        slika: req.body.avatar,
         created_at: Date.now()
     };
     Uporabnik.create(noviUporabnik).then(data => {
@@ -283,7 +283,7 @@ module.exports.posodobiOsebnePodatke = function (req, res, next) {
         vrsta: parseInt(req.body.izbranaVrsta),
     };
     if (req.body.reg_password) updateUporabnik.geslo = hash(req.body.set_password);
-    if (req.body.avatar) updateUporabnik.slika = "" + req.body.avatar;
+    if (req.body.avatar) updateUporabnik.slika = req.body.avatar;
     let conditions = { _id: req.session.trenutniUporabnik.id };
     Uporabnik.findOneAndUpdate(conditions, updateUporabnik, { upsert: true, runValidators: true }, function (err, doc) { // callback
         if (err) {
