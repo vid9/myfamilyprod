@@ -586,19 +586,46 @@ module.exports.ustvariNalogo = function (req, res, next) {
             res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
             return;
         } else {
+            console.log(doc,"123", novaNaloga);
+            if (req.body.mode || req.body.newStatus == true) {
+                //console.log(novaNaloga.vezani_uporabniki);
+                let arr = doc.vezani_uporabniki;
+                let index = arr.indexOf(req.session.trenutniUporabnik._id);
+                if (index !== -1) arr.splice(index, 1);
+                console.log(arr, "user");
+                Subscription.find({ user_id: arr }, function (err, sub) {
+                    if (err) {
+                        console.log(err);
+                        return;
+                    }
+                    console.log(sub,"sub");
+                    for(let m = 0; m < sub.length;m++) {
+                        const payload = JSON.stringify({
+                            title: 'Obvestilo',
+                            body: 'Naloga '+doc.ime+' je bila opravljena. Dobili ste '+doc.xp+' točk!',
+                            icon: 'images/f.ico'
+                        });
+                        triggerPushMsg(sub[m], payload);
+                    }
+                });         
+            }            
             let o = doc.vezani_uporabniki.map(value => String(value));
-            let c = novaNaloga.vezani_uporabniki.map(value => String(value));
+            let c = o;
+            if (!req.body.mode) c = novaNaloga.vezani_uporabniki.map(value => String(value));
             let differenceO = o.filter(x => !c.includes(x));   
             let differenceC = c.filter(x => !o.includes(x)); 
-            console.log(differenceO, differenceC, "@@@@@@@@@@");
-            if(req.body.newStatus == "true" && req.body.oldStatus == "false") {
-                Uporabnik.update({ _id: { $in: novaNaloga.vezani_uporabniki } }, { $inc: { dayXp: req.body.xpNaloge } }, { multi: true }, function (err, docs) {
+            console.log(req.body.newStatus, req.body.oldStatus);
+            if(req.body.mode || (req.body.newStatus == "true" && req.body.oldStatus == "false")) {
+                let updt = doc.vezani_uporabniki;
+                if (novaNaloga.vezani_uporabniki) updt = novaNaloga.vezani_uporabniki;
+                let upXp = doc.xp;
+                if (novaNaloga.xp) upXp = novaNaloga.xp;
+                Uporabnik.update({ _id: { $in: updt } }, { $inc: { dayXp: upXp } }, { multi: true }, function (err, docs) {
                     if (err) {
                         console.log(err);
                         res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
                         return;
                     }
-                    console.log("Primer 1");
                 });
             } else if (req.body.newStatus == "true" && req.body.oldStatus == "true") {
                 let dif = [];
@@ -606,11 +633,9 @@ module.exports.ustvariNalogo = function (req, res, next) {
                 if (differenceO.length != 0) { 
                     dif = differenceO;
                     pre = -1;
-                    console.log("Primer 2");
                 } else {
                     dif = differenceC;
                     pre = 1;
-                    console.log("Primer 2.5");
                 }      
                 Uporabnik.update({ _id: { $in: dif } }, { $inc: { dayXp: req.body.xpNaloge*pre } }, { multi: true }, function (err, docs) {
                     if (err) {
@@ -626,29 +651,9 @@ module.exports.ustvariNalogo = function (req, res, next) {
                         res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
                         return;
                     }
-                    console.log("Primer 3");
                 }); 
             }
-            if (req.body.mode || req.body.newStatus == true) {
-                //console.log(novaNaloga.vezani_uporabniki);
-                let arr = novaNaloga.vezani_uporabniki;
-                let index = arr.indexOf(req.session.trenutniUporabnik._id);
-                if (index !== -1) arr.splice(index, 1);
-                Subscription.find({ user_id: arr }, function (err, sub) {
-                    if (err) {
-                        console.log(err);
-                        return;
-                    }
-                    for(let m = 0; m < sub.length;m++) {
-                        const payload = JSON.stringify({
-                            title: 'Obvestilo',
-                            body: 'Naloga '+novaNaloga.ime+' je bila opravljena. Dobili ste '+novaNaloga.xp+' točk!',
-                            icon: 'images/f.ico'
-                        });
-                        triggerPushMsg(sub[m], payload);
-                    }
-                });         
-            }
+            console.log("before");
             //Če je naloga prestavljena pod drug cilj, sinhorniziram točke
             if (vCilj) {
                 console.log("naloga je vezana na cilj");
