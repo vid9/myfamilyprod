@@ -33,20 +33,6 @@ webpush.setVapidDetails(
 let once = 0;
 
 
-let xpClean = new CronJob({
-    cronTime: '0 0 0 * * *',
-    onTick: function () {
-        Uporabnik.where().updateMany({ $set: { "dayXp": 0 } }, function (err, res) {
-            if (err) {
-                console.log(err);
-            } else { console.log(res); }
-        });
-    },
-    start: true,
-    context: { dayXp: 0 }
-});
-
-
 let jobsCounter = 0;
 let jobs = {};
 
