@@ -75,14 +75,6 @@ gulp.task('default', function() {
     // place code for your default task here
   });
 
-  if(process.env.NODE_ENV === "production"){
-    app.set('trust proxy', 1) // trust first proxy
-    app.use(session({
-        cookie : {
-            secure: true,
-        }
-    }));
-}
 
 app.listen(process.env.PORT || 3000);
 
