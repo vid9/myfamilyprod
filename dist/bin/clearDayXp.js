@@ -7,8 +7,8 @@ mongoose.connect(process.env.MONGODB_URI, function (error) {
     else console.log('mongo connected');
 });
 
-require("./Uporabnik");
-let Uporabnik = mongoose.model("Uporabnik");
+require(".models/Uporabnik");
+let Uporabnik = mongoose.model("../models/Uporabnik");
 
 console.log("Deleting daily xp");
 deleteXp();
