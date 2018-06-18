@@ -5,9 +5,10 @@ let  mongo = require('mongodb');
 console.log("Deleting daily xp");
 
 mongo.connect(process.env.MONGOLAB_URI, {}, function(error, db){
-    db.addListener("error", function(error){
-      console.log("Error connecting to MongoLab");
-    });
+    if (error) {
+        console.log(error);
+    }
+    console.log(db);
     db.Uporabnik.updateMany({ $set: { "dayXp": 0 } }, function (err, res) {
         if (err) {
             console.log(err);
