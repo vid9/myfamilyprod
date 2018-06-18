@@ -4,7 +4,7 @@ let  mongo = require('mongodb');
 
 console.log("Deleting daily xp");
 
-mongo.connect(process.env.MONGOLAB_URI, {}, function(error, db){
+mongo.connect(process.env.DB_url, {}, function(error, db){
     if (error) {
         console.log(error);
     }
