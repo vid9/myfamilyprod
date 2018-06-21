@@ -519,7 +519,7 @@ module.exports.prikaziNaloge = function (req, res, next) {
 
 //** POST /ustvari_nalogo
 module.exports.ustvariNalogo = function (req, res, next) {
-    if (checkIfLogged(res, req) != 0) return;
+    if (!req.body.mode) if (checkIfLogged(res, req) != 0) return;
     if (!validatenaloga(req, res)) return;
     if (req.body.oldCilj) if (!validator.isMongoId(req.body.oldCilj)) { vrniNapako(res, "Napačena oblika mongoId cilja!" + req.body.oldCilj); return false; }
     if (!req.body.dateZacetek) req.body.dateZacetek = new Date().toLocaleTimeString('sl-SI', { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", timeZoneName: "short" });
