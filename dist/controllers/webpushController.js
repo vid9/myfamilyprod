@@ -80,7 +80,7 @@ module.exports.odstraniObvestila = function (req, res) {
 
 //** POST /api/prijava
 module.exports.posljiToken = function (req, res) {
-  console.log(req);
+  console.log(req.body);
   Uporabnik.find({email: req.body.email}, function (err, uporabniki) {
     if (err) {
       console.log(err);
@@ -95,6 +95,16 @@ module.exports.posljiToken = function (req, res) {
 
 //** GET /api/naloge/:userId
 module.exports.posljiNaloge = function (req, res) {
+  let a = request.post(
+    'https://ekosmartweb.herokuapp.com/api/prijava',
+    { json: { email: "test@test.si" } },
+    function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            console.log("uspešno");
+        }
+    }
+  );
+  console.log(a);
   let query = {};
   if(req.params.userId) query = { vezani_uporabniki: {$in: [req.params.userId]}};
   Naloge.find(query, function (err, doc) {
