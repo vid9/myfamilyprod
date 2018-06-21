@@ -87,7 +87,7 @@ module.exports.posljiToken = function (req, res) {
       res.status(404).send(err);
     } else {
       if (uporabniki.email == req.body.email) {
-        console.log("created token");
+        console.log("created token", uporabniki._id);
         res.status(200).send({ token: uporabniki._id});
       }
     }
@@ -117,7 +117,7 @@ module.exports.posljiCilje = function (req, res) {
         console.log(err);
         res.status(404).send(err);
       } else {
-        res.send(doc);
+        res.status(200).send(doc);
       }
   });
 };
@@ -125,7 +125,8 @@ module.exports.posljiCilje = function (req, res) {
 //** POST /api/koraki/
 module.exports.prejmiKorake = function (req, res) {
   console.log(req.body);
-  res.status(200);
+  console.log("koraki delajo")
+  res.sendStatus(200);
   /*
   Uporabnik.findOneAndUpdate({ _id: mongoose.Types.ObjectId(req.body.token)}, { koraki: req.body.koraki}, { upsert: true, runValidators: true }, function (err, doc) { // callback
     if (err) {
@@ -147,7 +148,9 @@ module.exports.prejmiNalogo = function (req, res) {
     { json: { mode: 'true', newDialog: req.body.idNaloge } },
     function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            console.log(body);
+          res.sendStatus(200);
+        } else {
+          res.sendStatus(404);
         }
     }
   );
