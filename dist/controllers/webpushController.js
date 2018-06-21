@@ -96,23 +96,12 @@ module.exports.posljiToken = function (req, res) {
 
 //** GET /api/naloge/:userId
 module.exports.posljiNaloge = function (req, res) {
-  request.post(
-    'https://ekosmartweb.herokuapp.com/api/prijava',
-    { json: { email: "test@mikropis.si" } },
-    function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            console.log("uspešno");
-        }
-    }
-  );
-  console.log("request done");
-  //console.log(a);
   let query = {};
   if(req.params.userId) query = { vezani_uporabniki: {$in: [req.params.userId]}};
   Naloge.find(query, function (err, doc) {
     if (err) {
         console.log(err);
-        res.status(404).send('Prišlo je do napake!');;
+        res.status(404).send(err);
       } else {
         res.status(200).send(doc);
       }
@@ -122,11 +111,11 @@ module.exports.posljiNaloge = function (req, res) {
 //** GET /api/cilji/:userId
 module.exports.posljiCilje = function (req, res) {
   let query = {};
-  if(req.params.userId) query = { vezani_uporabniki: {$in: [req.params.userId]}};
+  if(req.params.userId) query = { "vezani_uporabniki.id_user" : {$in: [req.params.userId]}};
   Cilji.find(query, function (err, doc) {
     if (err) {
         console.log(err);
-        res.status(404);
+        res.status(404).send(err);
       } else {
         res.send(doc);
       }
@@ -138,7 +127,7 @@ module.exports.prejmiKorake = function (req, res) {
   Uporabnik.findOneAndUpdate({ _id: mongoose.Types.ObjectId(req.body.token)}, { koraki: req.body.koraki}, { upsert: true, runValidators: true }, function (err, doc) { // callback
     if (err) {
       console.log(err);
-      res.status(500);
+      res.status(500).send(err);
     } else {
       res.status(200);
     }
