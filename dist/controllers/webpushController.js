@@ -3,6 +3,7 @@ let request = require('request');
 
 let Subscription = mongoose.model("Subscription");
 let Naloge = mongoose.model("Naloge");
+let Cilji = mongoose.model("Cilji");
 let Uporabnik = mongoose.model("Uporabnik");
 
 
@@ -80,9 +81,6 @@ module.exports.odstraniObvestila = function (req, res) {
 
 //** POST /api/prijava
 module.exports.posljiToken = function (req, res) {
-  console.log(req.body);
-  console.log(req.body.email);
-  console.log("bla bla")
   Uporabnik.find({email: req.body.email}, function (err, uporabniki) {
     if (err) {
       console.log(err);
@@ -99,8 +97,8 @@ module.exports.posljiToken = function (req, res) {
 //** GET /api/naloge/:userId
 module.exports.posljiNaloge = function (req, res) {
   request.post(
-    'localhost:3000/api/prijava',
-    { json: { email: "test@test.si" } },
+    'https://ekosmartweb.herokuapp.com/api/prijava',
+    { json: { email: "test@mikropis.si" } },
     function (error, response, body) {
         if (!error && response.statusCode == 200) {
             console.log("uspešno");
