@@ -86,8 +86,8 @@ module.exports.posljiToken = function (req, res) {
       console.log(err);
       res.status(404).send(err);
     } else {
-
       if (uporabniki.email == req.body.email) {
+        console.log("created token");
         res.status(200).send({ token: uporabniki._id});
       }
     }
@@ -124,24 +124,30 @@ module.exports.posljiCilje = function (req, res) {
 
 //** POST /api/koraki/
 module.exports.prejmiKorake = function (req, res) {
+  console.log(req.body);
+  res.status(200);
+  /*
   Uporabnik.findOneAndUpdate({ _id: mongoose.Types.ObjectId(req.body.token)}, { koraki: req.body.koraki}, { upsert: true, runValidators: true }, function (err, doc) { // callback
     if (err) {
       console.log(err);
       res.status(500).send(err);
     } else {
+      console.l
       res.status(200);
     }
   });
+  */
 };
 
 //** POST /api/naloga/
 module.exports.prejmiNalogo = function (req, res) {
+  console.log(req.body);
   request.post(
     'https://ekosmartweb.herokuapp.com/ustvari_nalogo',
     { json: { mode: 'true', newDialog: req.body.idNaloge } },
     function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            console.log(body)
+            console.log(body);
         }
     }
   );
