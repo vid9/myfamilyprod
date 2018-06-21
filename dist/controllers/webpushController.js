@@ -80,10 +80,11 @@ module.exports.odstraniObvestila = function (req, res) {
 
 //** POST /api/prijava
 module.exports.posljiToken = function (req, res) {
+  console.log(req);
   Uporabnik.find({email: req.body.email}, function (err, uporabniki) {
     if (err) {
       console.log(err);
-      res.status(404).send('Elektronski naslov in geslo se ne ujemata!');
+      res.status(404).send(err);
     } else {
       if (uporabniki.email == email) {
         res.status(200).send({ token: uporabniki._id});
