@@ -26,6 +26,7 @@
     "mongoose": "^4.13.7",
     "nodemailer": "^4.6.3",
     "path": "^0.12.7",
+    "request": "^2.87.0",
     "serve-favicon": "^2.4.5",
     "short-mongo-id": "^0.1.1",
     "smsapicom": "^1.5.1",

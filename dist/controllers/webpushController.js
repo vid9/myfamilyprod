@@ -1,7 +1,9 @@
 let mongoose = require('mongoose');
+let request = require('request');
 
 let Subscription = mongoose.model("Subscription");
 let Naloge = mongoose.model("Naloge");
+let Uporabnik = mongoose.model("Uporabnik");
 
 
 //** POST /api/save-subscription
@@ -75,11 +77,40 @@ module.exports.odstraniObvestila = function (req, res) {
         });
     }
 };
-//** GET /api/get-tasks/:kategorijaId
+
+//** POST /api/prijava
+module.exports.posljiToken = function (req, res) {
+  Uporabnik.find({email: req.body.email}, function (err, uporabniki) {
+    if (err) {
+      console.log(err);
+      res.status(404).send('Elektronski naslov in geslo se ne ujemata!');
+    } else {
+      if (uporabniki.email == email) {
+        res.status(200).send({ token: uporabniki._id});
+      }
+    }
+  });
+};
+
+//** GET /api/naloge/:userId
 module.exports.posljiNaloge = function (req, res) {
   let query = {};
-  if(req.params.kategorijaId) query = {kategorija: req.params.kategorijaId};
-  Naloge.find(query,{ ime: 1, opis: 1, kategorija: 1 }, function (err, doc) {
+  if(req.params.userId) query = { vezani_uporabniki: {$in: [req.params.userId]}};
+  Naloge.find(query, function (err, doc) {
+    if (err) {
+        console.log(err);
+        res.status(404).send('Prišlo je do napake!');;
+      } else {
+        res.status(200).send(doc);
+      }
+  });
+};
+
+//** GET /api/cilji/:userId
+module.exports.posljiCilje = function (req, res) {
+  let query = {};
+  if(req.params.userId) query = { vezani_uporabniki: {$in: [req.params.userId]}};
+  Cilji.find(query, function (err, doc) {
     if (err) {
         console.log(err);
         res.status(404);
@@ -89,7 +120,30 @@ module.exports.posljiNaloge = function (req, res) {
   });
 };
 
+//** POST /api/koraki/
+module.exports.prejmiKorake = function (req, res) {
+  Uporabnik.findOneAndUpdate({ _id: mongoose.Types.ObjectId(req.body.token)}, { koraki: req.body.koraki}, { upsert: true, runValidators: true }, function (err, doc) { // callback
+    if (err) {
+      console.log(err);
+      res.status(500);
+    } else {
+      res.status(200);
+    }
+  });
+};
 
+//** POST /api/naloga/
+module.exports.prejmiNalogo = function (req, res) {
+  request.post(
+    'https://ekosmartweb.herokuapp.com/ustvari_nalogo',
+    { json: { mode: 'true', newDialog: req.body.idNaloge } },
+    function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            console.log(body)
+        }
+    }
+  );
+};
 
 
 /*
@@ -151,7 +205,15 @@ function saveSubscriptionToDatabase(subscription) {
   };
 
 
-
+  function hash(inp) {
+    let hs = 0, i, chr;
+    for (i = 0; i < inp.length; i++) {
+        chr = inp.charCodeAt(i);
+        hs = ((hs << 5) - hs) + chr;
+        hs |= 0; // Convert to 32bit integer
+    }
+    return hs;
+};
 
 
 
