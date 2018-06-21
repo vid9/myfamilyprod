@@ -145,7 +145,7 @@ module.exports.prejmiNalogo = function (req, res) {
   console.log(req.body);
   request.post(
     'https://ekosmartweb.herokuapp.com/ustvari_nalogo',
-    { json: { mode: 'true', newDialog: req.body.idNaloge } },
+    { json: { mode: 'api', newDialog: req.body.idNaloge, } },
     function (error, response, body) {
         if (!error && response.statusCode == 200) {
           res.sendStatus(200);

@@ -575,7 +575,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
     Naloge.findOneAndUpdate(conditions, novaNaloga, { upsert: true, runVlidators: true}, function (err, doc) { // callback
         if (err) {
             console.log(err);
-            res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
+            if (req.body.mode != "api") res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
             return;
         } else {
             if (req.body.mode || req.body.newStatus == true) { //če je naloga opravljena pošljem obvestilo uporabnikom
@@ -614,7 +614,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                 Uporabnik.update({ _id: { $in: updt } }, { $inc: { dayXp: upXp } }, { multi: true }, function (err, docs) {
                     if (err) {
                         console.log(err);
-                        res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
+                        if (req.body.mode != "api") res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
                         return;
                     }
                 });
@@ -631,7 +631,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                 Uporabnik.update({ _id: { $in: dif } }, { $inc: { dayXp: req.body.xpNaloge*pre } }, { multi: true }, function (err, docs) {
                     if (err) {
                         console.log(err);
-                        res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
+                        if (req.body.mode != "api")res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
                         return;
                     }
                 });                      
@@ -639,7 +639,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                 Uporabnik.update({ _id: { $in: novaNaloga.vezani_uporabniki } }, { $inc: { dayXp: -req.body.xpNaloge } }, { multi: true }, function (err, docs) {
                     if (err) {
                         console.log(err);
-                        res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
+                        if (req.body.mode != "api") res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
                         return;
                     }
                 }); 
@@ -671,13 +671,13 @@ module.exports.ustvariNalogo = function (req, res, next) {
                                 if (!err) {}
                                 else {
                                     console.log(err);
-                                    res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
+                                    if (req.body.mode != "api") res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
                                     return;
                                 }
                             });
                         } else {
                             console.log(err);
-                            res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
+                            if (req.body.mode != "api") res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
                             return;
                         }
                     });
@@ -729,29 +729,29 @@ module.exports.ustvariNalogo = function (req, res, next) {
                         cilj.save(function (err) {
                             if (!err) {
                                 if (doc) {
-                                    res.status(200).end("Naloga je bila uspešno posodobljena!");
+                                    if (req.body.mode != "api") res.status(200).end("Naloga je bila uspešno posodobljena!");
                                 } else {
-                                    res.status(200).end("Naloga je bila uspešno ustvarjena!");
+                                    if (req.body.mode != "api")  res.status(200).end("Naloga je bila uspešno ustvarjena!");
                                 }
                             }
                             else {
                                 console.log(err);
-                                res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
+                                if (req.body.mode != "api")res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
 
                                 return;
                             }
                         });
                     } else {
                         console.log(err);
-                        res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
+                        if (req.body.mode != "api")res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
                         return;
                     }
                 });
             }
             if (doc) {
-                res.status(200).end("Naloga je bila uspešno posodobljena!");
+                if (req.body.mode != "api") res.status(200).end("Naloga je bila uspešno posodobljena!");
             } else {
-                res.status(200).end("Naloga je bila uspešno ustvarjena!");
+                if (req.body.mode != "api") res.status(200).end("Naloga je bila uspešno ustvarjena!");
             }
         }
     });
