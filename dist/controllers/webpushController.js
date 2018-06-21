@@ -96,6 +96,7 @@ module.exports.posljiToken = function (req, res) {
 
 //** GET /api/naloge/:userId
 module.exports.posljiNaloge = function (req, res) {
+
   let query = {};
   if(req.params.userId) query = { vezani_uporabniki: {$in: [req.params.userId]}};
   Naloge.find(query, function (err, doc) {
@@ -148,8 +149,10 @@ module.exports.prejmiNalogo = function (req, res) {
     { json: { mode: 'api', newDialog: req.body.idNaloge, } },
     function (error, response, body) {
         if (!error && response.statusCode == 200) {
+          console.log("dela");
           res.sendStatus(200);
         } else {
+          console.log("ne dela");
           res.sendStatus(404);
         }
     }
