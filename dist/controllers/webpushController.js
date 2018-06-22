@@ -100,7 +100,7 @@ module.exports.posljiToken = function (req, res) {
   });
 };
 
-//** GET /api/naloge/:userId
+//** GET /api/naloge/
 module.exports.posljiNaloge = function (req, res) {
   let query = {};
   if(req.headers.token) {
@@ -137,7 +137,7 @@ module.exports.posljiCilje = function (req, res) {
 };
 
 //** GET /api/kategorije
-module.exports.posljiKategorija = function (req, res) {
+module.exports.posljiKategorije = function (req, res) {
   Kategorija.find(function (err, doc) {
     if (err) {
       console.log(err);
