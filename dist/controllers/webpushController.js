@@ -82,12 +82,13 @@ module.exports.odstraniObvestila = function (req, res) {
 
 //** POST /api/prijava
 module.exports.posljiToken = function (req, res) {  
+  console.log(req.headers);
   Uporabnik.find({email: req.headers.email}, function (err, uporabniki) {
     if (err) {
       console.log(err);
       res.status(404).send(err);
     } else {
-      if (uporabniki.email == req.headers.email && uporabniki.password ==  req.headers.password) {
+      if (uporabniki.email == req.headers.email && uporabniki.password == hash(req.headers.password)) {
         let user = {};
         user.id  = uporabniki._id,
         user.email = uporabniki.email,
@@ -102,6 +103,7 @@ module.exports.posljiToken = function (req, res) {
 
 //** GET /api/naloge/
 module.exports.posljiNaloge = function (req, res) {
+  console.log(req.headers);
   let query = {};
   if(req.headers.token) {
     query = { vezani_uporabniki: {$in: [req.headers.token]}};
@@ -120,6 +122,7 @@ module.exports.posljiNaloge = function (req, res) {
 
 //** GET /api/cilji
 module.exports.posljiCilje = function (req, res) {
+  console.log(req.headers);
   let query = {};
   if(req.headers.token) {
     query = { "vezani_uporabniki.id_user" : {$in: [req.headers.token]}};
@@ -151,6 +154,7 @@ module.exports.posljiKategorije = function (req, res) {
 
 //** POST /api/koraki/
 module.exports.prejmiKorake = function (req, res) {
+  console.log(req.headers);
   console.log(req.body);
   console.log("koraki delajo")
   res.sendStatus(200);
