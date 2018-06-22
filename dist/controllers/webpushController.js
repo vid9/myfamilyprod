@@ -5,6 +5,7 @@ let Subscription = mongoose.model("Subscription");
 let Naloge = mongoose.model("Naloge");
 let Cilji = mongoose.model("Cilji");
 let Uporabnik = mongoose.model("Uporabnik");
+let Kategorija = mongoose.model("Uporabnik");
 
 
 //** POST /api/save-subscription
@@ -80,15 +81,20 @@ module.exports.odstraniObvestila = function (req, res) {
 };
 
 //** POST /api/prijava
-module.exports.posljiToken = function (req, res) {
-  Uporabnik.find({email: req.body.email}, function (err, uporabniki) {
+module.exports.posljiToken = function (req, res) {  
+  Uporabnik.find({email: req.headers.email}, function (err, uporabniki) {
     if (err) {
       console.log(err);
       res.status(404).send(err);
     } else {
-      if (uporabniki.email == req.body.email) {
-        console.log("created token", uporabniki._id);
-        res.status(200).send({ token: uporabniki._id});
+      if (uporabniki.email == req.headers.email && uporabniki.password ==  req.headers.password) {
+        let user = {};
+        user.id  = uporabniki._id,
+        user.email = uporabniki.email,
+        user.ime =  uporabniki.ime,
+        user.slika = uporabniki.slika,
+        console.log("created token", user);
+        res.status(200).send(user);
       }
     }
   });
@@ -96,32 +102,52 @@ module.exports.posljiToken = function (req, res) {
 
 //** GET /api/naloge/:userId
 module.exports.posljiNaloge = function (req, res) {
-
   let query = {};
-  if(req.params.userId) query = { vezani_uporabniki: {$in: [req.params.userId]}};
-  Naloge.find(query, function (err, doc) {
-    if (err) {
-        console.log(err);
-        res.status(404).send(err);
-      } else {
-        res.status(200).send(doc);
-      }
-  });
+  if(req.headers.token) {
+    query = { vezani_uporabniki: {$in: [req.headers.token]}};
+    Naloge.find(query, function (err, doc) {
+      if (err) {
+          console.log(err);
+          res.status(404).send(err);
+        } else {
+          res.status(200).send(doc);
+        }
+    });
+  } else {
+    res.status(404).send(err);
+  }
 };
 
-//** GET /api/cilji/:userId
+//** GET /api/cilji
 module.exports.posljiCilje = function (req, res) {
   let query = {};
-  if(req.params.userId) query = { "vezani_uporabniki.id_user" : {$in: [req.params.userId]}};
-  Cilji.find(query, function (err, doc) {
-    if (err) {
+  if(req.headers.token) {
+    query = { "vezani_uporabniki.id_user" : {$in: [req.headers.token]}};
+    Cilji.find(query, function (err, doc) {
+      if (err) {
         console.log(err);
         res.status(404).send(err);
       } else {
         res.status(200).send(doc);
       }
+    });
+  } else {
+    res.status(404).send(err);
+  }
+};
+
+//** GET /api/kategorije
+module.exports.posljiKategorija = function (req, res) {
+  Kategorija.find(function (err, doc) {
+    if (err) {
+      console.log(err);
+      res.status(404).send(err);
+    } else {
+      res.status(200).send(doc);
+    }
   });
 };
+
 
 //** POST /api/koraki/
 module.exports.prejmiKorake = function (req, res) {
