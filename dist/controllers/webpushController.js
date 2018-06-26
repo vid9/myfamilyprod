@@ -86,6 +86,8 @@ module.exports.odstraniObvestila = function (req, res) {
 //** POST /api/prijava
 module.exports.posljiToken = function (req, res) {  
   if (req.headers.email && req.headers.password) {
+    console.log(req.headers.email, req.headers.password);
+    console.log(bcrypt.compareSync(req.headers.password, uporabniki[0].geslo));
     Uporabnik.find({email: req.headers.email}, function (err, uporabniki) {
       if (err) {
         console.log(err);
@@ -106,6 +108,7 @@ module.exports.posljiToken = function (req, res) {
           user.slika = uporabniki[0].slika;
           res.status(200).send(user);
         }
+        console.log("napacno geslo");
       }
     });
   } else {
@@ -175,23 +178,19 @@ module.exports.posljiKategorije = function (req, res) {
 module.exports.prejmiKorake = function (req, res) {
   console.log(req.headers);
   console.log(req.body);
-  console.log("koraki delajo")
-  res.sendStatus(200);
-  /*
-  Uporabnik.findOneAndUpdate({ _id: mongoose.Types.ObjectId(req.body.token)}, { koraki: req.body.koraki}, { upsert: true, runValidators: true }, function (err, doc) { // callback
-    if (err) {
-      console.log(err);
-      res.status(500).send(err);
-    } else {
-      console.l
-      res.status(200);
-    }
-  });
-  */
+  let token = req.headers.token;
+  if (token) {
+    jwt.verify(token, config.secret, function(err, decoded) {
+      if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      res.status(200).send(req.body);
+    });
+  } else {
+    res.status(401).send({ auth: false, message: 'No token provided.' });  
+  }
 };
 
-//** GET /api/družina/:druzinaId
-module.exports.prejmiDruzino = function (req, res) {
+//** GET /api/druzina/:druzinaId
+module.exports.posljiDruzino = function (req, res) {
   let token = req.headers.token;
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
