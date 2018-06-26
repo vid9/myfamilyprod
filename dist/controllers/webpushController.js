@@ -113,14 +113,14 @@ module.exports.posljiToken = function (req, res) {
   }
 };
 
-//** GET /api/naloge/
+//** GET /api/naloge/:userId
 module.exports.posljiNaloge = function (req, res) {
   let query = {};
   let token = req.headers.token;
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
       if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
-      query = { vezani_uporabniki: {$in: [mongoose.Types.ObjectId(decoded.id)]}};
+      query = { vezani_uporabniki: {$in: [mongoose.Types.ObjectId(req.params.userId)]}};
       Naloge.find(query, function (err, doc) {
         if (err) {
             console.log(err);
@@ -135,14 +135,14 @@ module.exports.posljiNaloge = function (req, res) {
   }
 };
 
-//** GET /api/cilji/
+//** GET /api/cilji/:userId
 module.exports.posljiCilje = function (req, res) {
   let query = {};
   let token = req.headers.token;
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
       if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
-      query = { "vezani_uporabniki.id_user" : {$in: [mongoose.Types.ObjectId(decoded.id)]}};
+      query = { "vezani_uporabniki.id_user" : {$in: [mongoose.Types.ObjectId(req.params.userId)]}};
       Cilji.find(query, function (err, doc) {
         if (err) {
           console.log(err);
@@ -188,6 +188,26 @@ module.exports.prejmiKorake = function (req, res) {
     }
   });
   */
+};
+
+//** GET /api/družina/:druzinaId
+module.exports.prejmiDruzino = function (req, res) {
+  let token = req.headers.token;
+  if (token) {
+    jwt.verify(token, config.secret, function(err, decoded) {
+      if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      Uporabnik.find({druzina: req.params.druzinaId},{ id: 1, ime: 1, druzina: 1, polozaj: 1, slika: 1}, function (err, uporabniki) {
+        if (err) {
+          console.log(err);
+          res.status(404).send(err);
+        } else {
+            res.status(200).send(uporabniki);
+        }
+      });
+    });
+  } else {
+    res.status(401).send({ auth: false, message: 'No token provided.' });  
+  }
 };
 
 //** POST /api/naloga/:idNaloge

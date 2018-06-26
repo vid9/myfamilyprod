@@ -44,7 +44,7 @@ router.post('/api/prijava', subscriptionHandler.posljiToken);
 
 router.post('/api/koraki', subscriptionHandler.prejmiKorake);
 
-router.post('/api/naloga', subscriptionHandler.prejmiNalogo);
+router.post('/api/naloga/idNaloge', subscriptionHandler.prejmiNalogo);
 
 router.get('/api/naloge/', subscriptionHandler.posljiNaloge);
 
