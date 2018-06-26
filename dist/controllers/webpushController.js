@@ -86,8 +86,6 @@ module.exports.odstraniObvestila = function (req, res) {
 //** POST /api/prijava
 module.exports.posljiToken = function (req, res) {  
   if (req.headers.email && req.headers.password) {
-    console.log(req.headers.email, req.headers.password);
-    console.log(bcrypt.compareSync(req.headers.password, uporabniki[0].geslo));
     Uporabnik.find({email: req.headers.email}, function (err, uporabniki) {
       if (err) {
         console.log(err);
@@ -215,9 +213,97 @@ module.exports.prejmiNalogo = function (req, res) {
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
       if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      let novaNaloga = {
+        status: true,
+      };
+      let conditions = { _id: req.params.idNaloge };
+    Naloge.findOneAndUpdate(conditions, novaNaloga, { upsert: true, runVlidators: true}, function (err, doc) { // callback
+      if (err) {
+          console.log(err);
+          if (req.body.mode != "api") res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
+          return;
+      } else {
+        let arr = doc.vezani_uporabniki;
+        let index = arr.indexOf(decoded._id);
+        if (index !== -1) arr.splice(index, 1);
+        Subscription.find({ user_id: arr }, function (err, sub) {
+              if (err) {
+                  console.log(err);
+                  return;
+              }
+              console.log(sub,"sub");
+              for(let m = 0; m < sub.length;m++) {
+                  const payload = JSON.stringify({
+                      title: 'Obvestilo',
+                      body: 'Naloga '+podatki.ime+' je bila opravljena. Dobili ste '+podatki.xp+' točk!',
+                      icon: 'images/f.ico'
+                  });
+                  triggerPushMsg(sub[m], payload);
+              }
+          });             
+          let updt = doc.vezani_uporabniki;
+          let upXp = doc.xp;
+          Uporabnik.update({ _id: { $in: updt } }, { $inc: { dayXp: upXp } }, { multi: true }, function (err, docs) {
+              if (err) {
+                  console.log(err);
+                  res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
+                  return;
+              }
+          });
+            //Iščem cilj, pod katerega je bila dodana naloga, uporabnikom prištejem vrednost za naloge, ki so jih naredili
+          Cilji.findOne({ _id: doc.vezan_cilj }, function (err, cilj) {
+            if (!err) {
+                let obj = cilj.vezani_uporabniki.map(value => String(value.id_user));
+                let curObj = doc.vezani_uporabniki.map(value => String(value));
+                if (!obj) obj = {};
+                for (let i = 0; i < doc.vezani_uporabniki.length; i++) {
+                    let index = obj.indexOf(String(doc.vezani_uporabniki[i]));
+                    if (index > -1) { //prištejem točke                               
+                        cilj.vezani_uporabniki[index].xp_user = parseInt(cilj.vezani_uporabniki[index].xp_user) + doc.xp;
+                    } else {  //Če uporabnik še ni v cilju, ga dodam                 
+                          cilj.vezani_uporabniki.push({ "id_user": doc.vezani_uporabniki[i], "xp_user": doc.xp });
+                    }                          
+                }
+                //console.log("Osvežim točke cilja");               
+                obj = cilj.vezane_naloge.map(value => String(value.id_nal));
+                let nalId = conditions._id;
+                nalId = req.params.idNaloge;
+                if (obj) {
+                    let index = obj.indexOf(nalId);
+                    if (index > -1) {
+                        cilj.vezane_naloge[index].stanje = true;
+                    } else {
+                        cilj.vezane_naloge.push({ "id_nal": nalId, "stanje": true });
+                    }
+                }
+                cilj.save(function (err) {
+                  if (!err) {
+                      if (doc) {
+                        return res.status(200).end("Naloga je bila uspešno posodobljena!");
+                      } else {
+                        return res.status(200).end("Naloga je bila uspešno ustvarjena!");
+                      }
+                  }
+                  else {
+                    console.log(err);
+                    return res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
+                  }
+                });
+              } else {
+                  console.log(err);
+                  return res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
+              }
+          });
+        }
+        if (doc) {
+          return res.status(200).end("Naloga je bila uspešno posodobljena!");
+        } else {
+          return res.status(200).end("Naloga je bila uspešno ustvarjena!");
+        }      
+    });
+    /*
       request.post('https://ekosmartweb.herokuapp.com/ustvari_nalogo').form({mode: 'api', newDialog: req.params.idNaloge});
       res.sendStatus(200);
-      /*
       request.post(
         'localhost:3000/ustvari_nalogo',
         { json: { mode: 'api', newDialog: req.params.idNaloge, } },
@@ -233,13 +319,7 @@ module.exports.prejmiNalogo = function (req, res) {
     });
   } else {
     res.status(401).send({ auth: false, message: 'No token provided.' });  
-  }
-
-
-
-
-  console.log(req.body);
-  
+  }  
 };
 
 

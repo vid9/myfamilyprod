@@ -558,8 +558,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
             status: req.body.newStatus,
             druzina: mongoose.Types.ObjectId(req.session.trenutniUporabnik.druzina),
         };
-    }
-    
+    }    
     if (mongoose.Types.ObjectId.isValid(req.body.person)) {
         novaNaloga.vezani_uporabniki.push(req.body.person);
     } else {
