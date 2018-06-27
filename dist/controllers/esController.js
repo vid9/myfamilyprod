@@ -1233,11 +1233,6 @@ function queryNaloge(query, fields) {
     });
 }
 
-async function getNaloge(query) {
-    let res = await queryNaloge(query, {});
-    return res;
-}
-
 function queryKategorija(query, fields) {
     return new Promise(function (resolve, reject) {
         Kategorija.find(query, fields, function (err, result) {
