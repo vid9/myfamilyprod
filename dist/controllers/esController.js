@@ -522,6 +522,15 @@ module.exports.prikaziNaloge = function (req, res, next) {
 //** POST /ustvari_nalogo
 module.exports.ustvariNalogo = function (req, res, next) {
     if (!req.body.mode) if (checkIfLogged(res, req) != 0) return;
+    let oldDoc = {};
+    if (req.body.newDialog) {
+        queryNaloge({_id: mongoose.Types.ObjectId(req.body.newDialog)}).then(function(res) {
+            oldDoc = res;
+        }).catch(function(err) {
+            console.log(err);
+            return;
+        });
+    }
     if (!validatenaloga(req, res)) return;
     if (req.body.oldCilj) if (!validator.isMongoId(req.body.oldCilj)) { vrniNapako(res, "Napačena oblika mongoId cilja!" + req.body.oldCilj); return false; }
     if (!req.body.dateZacetek) req.body.dateZacetek = new Date().toLocaleTimeString('sl-SI', { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", timeZoneName: "short" });
@@ -573,12 +582,12 @@ module.exports.ustvariNalogo = function (req, res, next) {
     if (req.body.dateZacetek == "") novaNaloga.zacetek = dateNow();
     if (req.body.dateKonec == "") novaNaloga.konec = novaNaloga.zacetek;
     let conditions = { _id: req.body.newDialog ? req.body.newDialog : mongoose.Types.ObjectId() };
-    Naloge.findOneAndUpdate(conditions, novaNaloga, { runVlidators: true}, function (err, doc, xx) { // callback
+    Naloge.findOneAndUpdate(conditions, novaNaloga, {upsert: true,new: true, runVlidators: true}, function (err, doc) { // callback
         if (err) {
             console.log(err);
             return res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
         } else {
-            console.log(doc,"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", xx);
+            console.log(doc,"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", oldDoc);
             if (req.body.mode || req.body.newStatus == 'true' && req.body.oldStatus == 'false') { //če je naloga opravljena pošljem obvestilo uporabnikom
                 let podatki = doc ? doc : novaNaloga;
                 let arr = podatki.vezani_uporabniki;
@@ -891,11 +900,18 @@ module.exports.izbrisiCilj = function (req, res, next) {
 module.exports.posodobiNalogo = function (req, res, next) {
     if (!req.body.mode) if (checkIfLogged(res, req) != 0) return;
     let oldDoc = {};
-    if (req.body.newDialog && validator.isMongoId(req.body.newDialog)) { 
-        oldDoc = await queryNaloge({_id: mongoose.Types.ObjectId(req.body.newDialog)}, {});
+    let sprememba = 2; // 0 = true->false; 1 = false->true; 2 = false->false; 3 = true->true
+    if (req.body.newDialog) {
+        queryNaloge({_id: mongoose.Types.ObjectId(req.body.newDialog)}).then(function(res) {
+            oldDoc = res;
+        }).catch(function(err) {
+            console.log(err);
+            return;
+        });
     }
     let novaNaloga = {}
     if (req.body.mode) {
+        sprememba = 1;
         novaNaloga = {
             status: true,
         };
@@ -908,61 +924,42 @@ module.exports.posodobiNalogo = function (req, res, next) {
         if (!req.body.dateZacetek) req.body.dateZacetek = new Date().toLocaleTimeString('sl-SI', { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", timeZoneName: "short" });
         if (!req.body.dateKonec) req.body.dateKonec = new Date().toLocaleTimeString('sl-SI', { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", timeZoneName: "short" });
         if (req.body.dateZacetek > req.body.dateKonec) { vrniNapako(res, "Datum konca ne sme biti pred datumom začetka. " + req.body.dateZacetek + " " + req.body.dateKone); return; }
-        let dZac = req.body.dateZacetek;
-        let dKon = req.body.dateKonec;
-        if (dZac != "") {
-            if (dKon != "" && dZac > dKon) {
-                return vrniNapako(res, "Za vezan cilj so bili uporabljeni napačni znaki. " + dZac + " " + dKon);
-            }
+        if (req.body.dateZacetek == "") req.body.dateZacetek = dateNow();
+        if (req.body.dateKonec == "") req.body.dateKonec = dateNow();
+        novaNaloga.zacetek = req.body.dateZacetek;
+        novaNaloga.konec = req.body.dateKonec;
+        if (req.body.xpNaloge) {
+            novaNaloga.xp = req.body.xpNaloge;
+            let currXp = req.body.xpNaloge;
+            if (req.body.newStatus == "false" && req.body.oldStatus == "true") {currXp = -currXp;sprememba = 0}
+            else if (req.body.oldStatus == "false" && req.body.newStatus == "false") {currXp = 0;}
+            else if (req.body.oldStatus == "true" && req.body.newStatus == "true") currXp = 0;
         }
-        let currXp = req.body.xpNaloge;
-        if (req.body.newStatus == "false" && req.body.oldStatus == "true") currXp = -currXp;
-        else if (req.body.oldStatus == "false" && req.body.newStatus == "false") currXp = 0;
-        else if (req.body.oldStatus == "true" && req.body.newStatus == "true") currXp = 0;
         let vCilj = req.body.sampleCilj ? req.body.sampleCilj : null;
-    }
-    let novaNaloga = {}
-    if (req.body.mode) {
-        novaNaloga = {
-            status: true,
-        };
-    } else {
-        novaNaloga = {
-            ime: req.body.imeDialog,
-            opis: req.body.opisDialog,
-            kategorija: req.body.sampleKategorija,
-            zacetek: dZac,
-            konec: dKon,
-            vezani_uporabniki: [],
-            xp: req.body.xpNaloge,
-            vezan_cilj: vCilj,
-            avtor: ObjectId(req.session.trenutniUporabnik.id),
-            status: req.body.newStatus,
-            druzina: mongoose.Types.ObjectId(req.session.trenutniUporabnik.druzina),
-        };
-    }    
-    if (mongoose.Types.ObjectId.isValid(req.body.person)) {
-        novaNaloga.vezani_uporabniki.push(req.body.person);
-    } else {
-        if (req.body.person) {
-            for (let i = 0; i < req.body.person.length; i++) {
-                if (mongoose.Types.ObjectId.isValid(req.body.person[i])) {
-                    novaNaloga.vezani_uporabniki.push(mongoose.Types.ObjectId(req.body.person[i]));
+        if (vCilj) novaNaloga.vezan_cilj = vCilj;
+        novaNaloga.avtor = ObjectId(req.session.trenutniUporabnik.id);
+        novaNaloga.status = req.body.status;
+        if (mongoose.Types.ObjectId.isValid(req.body.person)) {
+            novaNaloga.vezani_uporabniki.push(req.body.person);
+        } else {
+            if (req.body.person) {
+                for (let i = 0; i < req.body.person.length; i++) {
+                    if (mongoose.Types.ObjectId.isValid(req.body.person[i])) {
+                        novaNaloga.vezani_uporabniki.push(mongoose.Types.ObjectId(req.body.person[i]));
+                    }
                 }
             }
         }
     }
-    if (req.body.dateZacetek == "") novaNaloga.zacetek = dateNow();
-    if (req.body.dateKonec == "") novaNaloga.konec = novaNaloga.zacetek;
     let conditions = { _id: req.body.newDialog ? req.body.newDialog : mongoose.Types.ObjectId() };
-    Naloge.findOneAndUpdate(conditions, novaNaloga, { runVlidators: true}, function (err, doc, xx) { // callback
+    Naloge.findOneAndUpdate(conditions, novaNaloga, {upsert: true, new: true, runVlidators: true}, function (err, doc) { // callback
         if (err) {
             console.log(err);
             return res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
         } else {
-            console.log(doc,"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", xx);
+            console.log(doc,"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", oldDoc);
             if (req.body.mode || req.body.newStatus == 'true' && req.body.oldStatus == 'false') { //če je naloga opravljena pošljem obvestilo uporabnikom
-                let podatki = doc ? doc : novaNaloga;
+                let podatki = doc ? doc : oldDoc;
                 let arr = podatki.vezani_uporabniki;
                 let index = arr.indexOf(req.session.trenutniUporabnik._id);
                 if (index !== -1) arr.splice(index, 1);
@@ -983,16 +980,15 @@ module.exports.posodobiNalogo = function (req, res, next) {
                     }
                 });         
             }     
-            if(!doc) doc = novaNaloga;  
-            let o = doc.vezani_uporabniki.map(value => String(value));
+            let o = oldDoc.vezani_uporabniki.map(value => String(value)); // uporabniki stare naloge
             let c = o;
-            if (!req.body.mode) c = novaNaloga.vezani_uporabniki.map(value => String(value));
-            let differenceO = o.filter(x => !c.includes(x));   
-            let differenceC = c.filter(x => !o.includes(x)); 
+            if (!req.body.mode) c = doc.vezani_uporabniki.map(value => String(value)); //uporabniki nove naloge
+            let differenceO = o.filter(x => !c.includes(x));   // dodani uporabniki
+            let differenceC = c.filter(x => !o.includes(x));  // izbrisani uporabniki
             if(req.body.mode || req.body.newStatus == "true" && req.body.oldStatus == "false") {
-                let updt = doc.vezani_uporabniki;
-                if (novaNaloga.vezani_uporabniki) updt = novaNaloga.vezani_uporabniki;
-                let upXp = doc.xp;
+                let updt = oldDoc.vezani_uporabniki;
+                if (doc) updt = doc.vezani_uporabniki;
+                let upXp = oldDoc.xp;
                 if (novaNaloga.xp) upXp = novaNaloga.xp;
                 Uporabnik.update({ _id: { $in: updt } }, { $inc: { dayXp: upXp } }, { multi: true }, function (err, docs) {
                     if (err) {
@@ -1235,6 +1231,11 @@ function queryNaloge(query, fields) {
             resolve(result);
         });
     });
+}
+
+async function getNaloge(query) {
+    let res = await queryNaloge(query, {});
+    return res;
 }
 
 function queryKategorija(query, fields) {
