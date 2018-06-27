@@ -106,7 +106,6 @@ module.exports.posljiToken = function (req, res) {
           user.slika = uporabniki[0].slika;
           res.status(200).send(user);
         }
-        console.log("napacno geslo");
       }
     });
   } else {
@@ -165,7 +164,6 @@ module.exports.posljiKategorije = function (req, res) {
       console.log(err);
       res.status(404).send(err);
     } else {
-      console.log(kat)
       res.status(200).send(kat);
     }
   });
@@ -174,8 +172,6 @@ module.exports.posljiKategorije = function (req, res) {
 
 //** POST /api/koraki/
 module.exports.prejmiKorake = function (req, res) {
-  console.log(req.headers);
-  console.log(req.body);
   let token = req.headers.token;
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
@@ -189,6 +185,7 @@ module.exports.prejmiKorake = function (req, res) {
 
 //** GET /api/druzina/:druzinaId
 module.exports.posljiDruzino = function (req, res) {
+  let object = {3 : "Vnuk/Vnukinja", 4: "Sin/Hči", 5:"Oče/Mati", 6:"Dedek/Babica", 7:"Pradedek/Prababica"};
   let token = req.headers.token;
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
@@ -198,6 +195,9 @@ module.exports.posljiDruzino = function (req, res) {
           console.log(err);
           res.status(404).send(err);
         } else {
+          for (let i=0;i<uporabniki.length;i++) {
+              uporabniki[i].polozaj = object[uporabniki[i].polozaj];
+          }
             res.status(200).send(uporabniki);
         }
       });
@@ -206,6 +206,12 @@ module.exports.posljiDruzino = function (req, res) {
     res.status(401).send({ auth: false, message: 'No token provided.' });  
   }
 };
+
+
+
+
+
+
 
 //** POST /api/naloga/:idNaloge
 module.exports.prejmiNalogo = function (req, res) {
@@ -231,11 +237,10 @@ module.exports.prejmiNalogo = function (req, res) {
                   console.log(err);
                   return;
               }
-              console.log(sub,"sub");
               for(let m = 0; m < sub.length;m++) {
                   const payload = JSON.stringify({
                       title: 'Obvestilo',
-                      body: 'Naloga '+podatki.ime+' je bila opravljena. Dobili ste '+podatki.xp+' točk!',
+                      body: 'Naloga '+doc.ime+' je bila opravljena. Dobili ste '+doc.xp+' točk!',
                       icon: 'images/f.ico'
                   });
                   triggerPushMsg(sub[m], payload);
@@ -300,22 +305,7 @@ module.exports.prejmiNalogo = function (req, res) {
         } else {
           return res.status(200).end("Naloga je bila uspešno ustvarjena!");
         }      
-    });
-    /*
-      request.post('https://ekosmartweb.herokuapp.com/ustvari_nalogo').form({mode: 'api', newDialog: req.params.idNaloge});
-      res.sendStatus(200);
-      request.post(
-        'localhost:3000/ustvari_nalogo',
-        { json: { mode: 'api', newDialog: req.params.idNaloge, } },
-        function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-              res.sendStatus(200);
-            } else {
-              console.log(error, response);
-              res.sendStatus(404);
-            }
-        }
-      );*/
+      });
     });
   } else {
     res.status(401).send({ auth: false, message: 'No token provided.' });  
