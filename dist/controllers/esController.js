@@ -1327,8 +1327,8 @@ function sendMail(naloga, users) {
         }
         for(let j = 0; j < emailusers.length; j++) {                        
             let vsebina = 'Nova naloga:\n\n';
-                vsebina += "Ime: "+naloga[0].ime+"\nOpis: "+naloga[0].opis+"\nZačetek: "+moment(naloga[0].zacetek).format("D. M ob H:m")+
-                "\nKonec: "+moment(naloga[i].konec).format("D. M ob H:m")+"\nTočk: "+naloga[i].xp+"\n\n";
+                vsebina += "Ime: "+naloga.ime+"\nOpis: "+naloga[0].opis+"\nZačetek: "+moment(naloga.zacetek).format("D. M ob H:m")+
+                "\nKonec: "+moment(naloga.konec).format("D. M ob H:m")+"\nTočk: "+naloga.xp+"\n\n";
             mailOptions = {
                 from: '"MyFamily mailer"'+process.env.mailUser,
                 to: '"Usr"'+emailusers[j].email,
