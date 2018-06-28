@@ -59,8 +59,8 @@ function vrniNapako(res, err) {
 
 //** GET /
 module.exports.naslovnaStran = function (req, res) {
-    //let t = mongoose.Types.ObjectId(); Short id za kategorije
-    //console.log(t, shortId(t));
+    let t = mongoose.Types.ObjectId(); //Short id za kategorije
+    console.log(t, shortId(t));
     if (checkIfLogged(res, req) != 0) return;
     let opomnik = [];
     let obj = { monthly: [] };
@@ -770,7 +770,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
 //** POST /ustvari_cilj
 module.exports.ustvariCilj = function (req, res, next) {
     if (checkIfLogged(res, req) != 0) return;
-    //console.log(req.body);
+    console.log(req.body);
     validateImeOpisId(req, res);
     if (!validator.isInt(req.body.xpNaloge)) { vrniNapako(res, "Dovoljene so samo cele številke."); return false; }
     let updated = dateNow();
@@ -899,6 +899,7 @@ module.exports.izbrisiCilj = function (req, res, next) {
 //** POST /posodobi_nalogo
 module.exports.ustvariNalogo = function (req, res, next) {
     if (!req.body.mode) if (checkIfLogged(res, req) != 0) return;
+    console.log(req.body);
     let currXp = 0, novaNaloga = {}, vCilj;
     let sprememba = 1; // 0 = true->false; 1 = false->true; 2 = false->false; 3 = true->true
     queryNaloge({_id: mongoose.Types.ObjectId(req.body.newDialog ? req.body.newDialog : null)}).then(function(oldDoc) {
@@ -908,7 +909,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                 status: true,
             };
         } else {
-            console.log(oldDoc);
+            //console.log(oldDoc);
             if (!validatenaloga(req, res)) return;
             if (req.body.imeDialog) novaNaloga.ime = req.body.imeDialog;
             if (req.body.opisDialog) novaNaloga.opis = req.body.opisDialog;
@@ -922,7 +923,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
             novaNaloga.zacetek = req.body.dateZacetek;
             novaNaloga.konec = req.body.dateKonec;
             if (req.body.xpNaloge) {
-                novaNaloga.xp = req.body.xpNaloge;
+                novaNaloga.xp = parseInt(req.body.xpNaloge);
                 currXp = req.body.xpNaloge;
                 if (oldDoc && req.body.newStatus == "false" && req.body.oldStatus == "true") {currXp = -oldDoc.xp;sprememba = 0;console.log("spr 0");}
                 else if (req.body.oldStatus == "false" && req.body.newStatus == "false") {currXp = 0; sprememba = 2;console.log("spr 2");}
@@ -935,7 +936,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
             if (vCilj) novaNaloga.vezan_cilj = vCilj;
             novaNaloga.avtor = ObjectId(req.session.trenutniUporabnik.id);
             novaNaloga.druzina = ObjectId(req.session.trenutniUporabnik.druzina);
-            if (req.body.status) novaNaloga.status = req.body.status;
+            if (req.body.newStatus) novaNaloga.status = (req.body.status == 'true');
             novaNaloga.vezani_uporabniki = [];
             if (req.body.person) {
                 if (mongoose.Types.ObjectId.isValid(req.body.person)) {
@@ -949,7 +950,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                 }
             }
         }
-        console.log(novaNaloga);
+        console.log(novaNaloga, "nova");
         let conditions = { _id: req.body.newDialog ? req.body.newDialog : mongoose.Types.ObjectId() };
         Naloge.findOneAndUpdate(conditions, novaNaloga, {upsert: true, new: true, runVlidators: true}, function (err, doc) { // callback
             if (err) {

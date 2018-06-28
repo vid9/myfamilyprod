@@ -1,5 +1,5 @@
 let mongoose = require('mongoose');
-let request = require('request');
+//let request = require('request');
 
 let Subscription = mongoose.model("Subscription");
 let Naloge = mongoose.model("Naloge");
@@ -373,3 +373,20 @@ function saveSubscriptionToDatabase(subscription) {
 
 
 
+function triggerPushMsg(subscription, payload) {
+  let options = {
+      TTL: 3600 // 1sec * 60 * 60 = 1h
+  };
+
+  return webpush.sendNotification(
+      subscription, 
+      payload,
+      options
+  ).catch((err) => {
+      if (err.statusCode === 410) {
+          return deleteSubscriptionFromDatabase(subscription._id);
+      } else {
+          console.log('Subscription is no longer valid: ', err);
+      }
+  });
+};
