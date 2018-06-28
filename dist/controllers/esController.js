@@ -27,22 +27,12 @@ let transporter = nodemailer.createTransport(sparkPostTransport({
   'sparkPostApiKey': process.env.SPARKPOST_API_KEY
 })) 
 
-/*
+
 let SMSAPI = require('smsapicom'),smsapi = new SMSAPI({
     oauth: {
         accessToken: process.env.SMSAPI_token
     }
 });
-
-
-
-function displayResult(result){
-    console.log(result);
-}
-
-function displayError(err){
-    console.error(err);
-}*/
 
 let color = { "5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5aeabcd8be609116280b4d9c": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3", "5aef78ab361f5244948ff58f": "#a3f7bf" };
 let urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -914,7 +904,7 @@ module.exports.izbrisiNalogo = function (req, res, next) {
                         }
                     });
                 } else {
-                    res.status(200).end("Napaka!");
+                    res.status(200).end("Naloga je bila uspešno izbrisana!");
                 }
             }
         });
@@ -1002,7 +992,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                     if (!oldDoc && doc.vezani_uporabniki) {
                         console.log(doc);
                         sendMail(doc, doc.vezani_uporabniki);
-                        console.log("nova naloga");
+                        sendSms(doc,doc.vezani_uporabniki);
                     }
                 }
                 if (oldDoc && req.body.mode || sprememba == 1) { //če je naloga opravljena pošljem obvestilo uporabnikom
@@ -1021,7 +1011,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                             const payload = JSON.stringify({
                                 title: 'Obvestilo',
                                 body: 'Naloga '+podatki.ime+' je bila opravljena. Dobili ste '+podatki.xp+' točk!',
-                                icon: 'images/f.ico'
+                                icon: 'public/images/f.ico'
                             });
                             triggerPushMsg(sub[m], payload);
                         }
@@ -1370,6 +1360,21 @@ function sendMail(naloga, users) {
                     console.log('Email sent: ' + info.response);
                 }
             });  
+        }
+    });
+}
+
+function sendSms(naloga, users) {
+    Uporabnik.find({ _id: { $in: users }, notf_telefon: true }, function (err, phoneUsr) {
+        if (err) {
+            console.log(error);
+            return;
+        }
+        for(let j = 0; j < phoneUsr.length; j++) {                        
+            let vsebina = 'Nova naloga:\n\n';
+                vsebina += "Ime: "+naloga.ime+"\nOpis: "+naloga.opis+"\nZacetek: "+moment(naloga.zacetek).format("D. M ob H:m")+
+                "\nKonec: "+moment(naloga.konec).format("D. M ob H:m")+"\nTock: "+naloga.xp+"\n\n";
+            sendMessage("MyFamily", phoneUsr[i].telefon, vsebina).then(displayResult).then(displayError);
         }
     });
 }

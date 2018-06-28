@@ -200,7 +200,7 @@ module.exports.posljiDruzino = function (req, res) {
           for (let i=0;i<uporabniki.length;i++) {
               uporabniki[i].polozaj = object[uporabniki[i].polozaj];
           }
-            res.status(200).send(uporabniki);
+          res.status(200).send(uporabniki);
         }
       });
     });
