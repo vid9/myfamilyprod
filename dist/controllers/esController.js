@@ -1353,7 +1353,7 @@ function sendMail(naloga, users) {
                 vsebina += "Ime: "+naloga.ime+"\nOpis: "+naloga.opis+"\nZačetek: "+moment(naloga.zacetek).format("D. M ob H:m")+
                 "\nKonec: "+moment(naloga.konec).format("D. M ob H:m")+"\nTočk: "+naloga.xp+"\n\n";
             mailOptions = {
-                from: 'MyFamily@'+process.env.SPARKPOST_SANDBOX_DOMAIN,
+                from: 'MyFamily@'+process.env.SPARKPOST_DOMAIN,
                 to: emailusers[j].email,
                 subject: "Nova naloga",
                 text: vsebina,

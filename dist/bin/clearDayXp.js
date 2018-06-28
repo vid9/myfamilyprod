@@ -119,7 +119,7 @@ function sendMail() {
                             "\nKonec: "+moment(temp[m].konec).format("D. M ob H:m")+"\nTočk: "+temp[m].xp+"\n\n";
                         }
                         mailOptions = {
-                            from: 'MyFamily@'+process.env.SPARKPOST_SANDBOX_DOMAIN,
+                            from: 'MyFamily@'+process.env.SPARKPOST_DOMAIN,
                             to: emailusers[j].email,
                             subject: "Opomnik " + moment(new Date()).format('M. D'),
                             text: vsebina,
