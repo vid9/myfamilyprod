@@ -228,18 +228,19 @@ module.exports.prejmiNalogo = function (req, res) {
     Naloge.findOneAndUpdate(conditions, novaNaloga, { upsert: true,new: true, runVlidators: true}, function (err, doc) { // callback
       if (err) {
           console.log(err);
-          if (req.body.mode != "api") res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
+          return res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
           return;
       } else {
-        /*
-        let arr = doc.vezani_uporabniki;
-        let index = arr.indexOf(decoded._id);
-        if (index !== -1) arr.splice(index, 1);
-        Subscription.find({ user_id: arr }, function (err, sub) {
+        if (doc) { //če je naloga opravljena pošljem obvestilo uporabnikom
+          let arr = doc.vezani_uporabniki;
+          let index = arr.indexOf(decoded._id);
+          if (index !== -1) arr.splice(index, 1);
+          Subscription.find({ user_id: arr }, function (err, sub) {
               if (err) {
                   console.log(err);
                   return;
               }
+              console.log(sub,"sub");
               for(let m = 0; m < sub.length;m++) {
                   const payload = JSON.stringify({
                       title: 'Obvestilo',
@@ -248,59 +249,63 @@ module.exports.prejmiNalogo = function (req, res) {
                   });
                   triggerPushMsg(sub[m], payload);
               }
-          });    */         
-          let updt = doc.vezani_uporabniki;
-          let upXp = doc.xp;
+          });         
+        }     
+        let updt, upXp;
+        if (doc) {
+          updt = doc.vezani_uporabniki;
+          upXp = doc.xp;
+        }
+        if (updt && upXp) {
           Uporabnik.update({ _id: { $in: updt } }, { $inc: { dayXp: upXp } }, { multi: true }, function (err, docs) {
               if (err) {
                   console.log(err);
-                  res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
-                  return;
+                  return res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
               }
           });
-            //Iščem cilj, pod katerega je bila dodana naloga, uporabnikom prištejem vrednost za naloge, ki so jih naredili
-          Cilji.findOne({ _id: doc.vezan_cilj }, function (err, cilj) {
-            if (!err) {
-                let obj = cilj.vezani_uporabniki.map(value => String(value.id_user));
-                let curObj = doc.vezani_uporabniki.map(value => String(value));
-                if (!obj) obj = {};
-                for (let i = 0; i < doc.vezani_uporabniki.length; i++) {
-                    let index = obj.indexOf(String(doc.vezani_uporabniki[i]));
-                    if (index > -1) { //prištejem točke                               
-                        cilj.vezani_uporabniki[index].xp_user = parseInt(cilj.vezani_uporabniki[index].xp_user) + doc.xp;
-                    } else {  //Če uporabnik še ni v cilju, ga dodam                 
-                          cilj.vezani_uporabniki.push({ "id_user": doc.vezani_uporabniki[i], "xp_user": doc.xp });
-                    }                          
-                }
-                //console.log("Osvežim točke cilja");               
-                obj = cilj.vezane_naloge.map(value => String(value.id_nal));
-                let nalId = conditions._id;
-                nalId = req.params.idNaloge;
-                if (obj) {
-                    let index = obj.indexOf(nalId);
-                    if (index > -1) {
-                        cilj.vezane_naloge[index].stanje = true;
+        }
+          //Iščem cilj, pod katerega je bila dodana naloga, uporabnikom prištejem vrednost za naloge, ki so jih naredili
+          let obj = {}, curObj = {};
+        Cilji.findOne({ _id: doc.vezan_cilj }, function (err, cilj) {
+          if (!err) {
+              obj = cilj.vezani_uporabniki.map(value => String(value.id_user));
+              curObj = doc.vezani_uporabniki.map(value => String(value));
+              for (let i = 0; i < curObj.length; i++) {
+                  let index = obj.indexOf(String(curObj[i]));
+                  if (index > -1) { //prištejem točke                               
+                      cilj.vezani_uporabniki[index].xp_user = parseInt(cilj.vezani_uporabniki[index].xp_user) + doc.xp;
+                  } else {  //Če uporabnik še ni v cilju, ga dodam                 
+                        cilj.vezani_uporabniki.push({ "id_user": doc.vezani_uporabniki[i], "xp_user": doc.xp });
+                  }                          
+              }
+              //console.log("Osvežim točke cilja");               
+              obj = cilj.vezane_naloge.map(value => String(value.id_nal));
+              let nalId = req.params.idNaloge;
+              if (obj) {
+                  let index = obj.indexOf(nalId);
+                  if (index > -1) {
+                      cilj.vezane_naloge[index].stanje = true;
+                  } else {
+                      cilj.vezane_naloge.push({ "id_nal": nalId, "stanje": true });
+                  }
+              }
+              cilj.save(function (err) {
+                if (!err) {
+                    if (doc) {
+                      return res.status(200).end("Naloga je bila uspešno posodobljena!");
                     } else {
-                        cilj.vezane_naloge.push({ "id_nal": nalId, "stanje": true });
+                      return res.status(200).end("Naloga je bila uspešno ustvarjena!");
                     }
                 }
-                cilj.save(function (err) {
-                  if (!err) {
-                      if (doc) {
-                        return res.status(200).end("Naloga je bila uspešno posodobljena!");
-                      } else {
-                        return res.status(200).end("Naloga je bila uspešno ustvarjena!");
-                      }
-                  }
-                  else {
-                    console.log(err);
-                    return res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
-                  }
-                });
-              } else {
+                else {
                   console.log(err);
                   return res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
-              }
+                }
+              });
+            } else {
+                console.log(err);
+                return res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
+            }
           });
         }
         if (doc) {
