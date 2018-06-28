@@ -21,7 +21,7 @@ let nodemailer = require('nodemailer');
 let shortId = require('short-mongo-id');
 let webpush = require('web-push');
 
-
+/*
 let SMSAPI = require('smsapicom'),smsapi = new SMSAPI({
     oauth: {
         accessToken: process.env.SMSAPI_token
@@ -36,7 +36,7 @@ function displayResult(result){
 
 function displayError(err){
     console.error(err);
-}
+}*/
 
 let color = { "5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5aeabcd8be609116280b4d9c": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3", "5aef78ab361f5244948ff58f": "#a3f7bf" };
 let urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -76,9 +76,6 @@ function vrniNapako(res, err) {
 
 //** GET /
 module.exports.naslovnaStran = function (req, res) {
-    sendMessage("+386051757557","ojla")
-    .then(displayResult)
-    .then(displayError)
     //let t = mongoose.Types.ObjectId(); //Short id za kategorije
     //console.log(t, shortId(t));
     if (checkIfLogged(res, req) != 0) return;
@@ -209,7 +206,6 @@ module.exports.prijava = function (req, res, next) {
 module.exports.prijaviUporabnika = function (req, res, next) {
     let email = req.body.email;
     let geslo = req.body.password;
-    console.log(geslo);
     Uporabnik.find(function (err, uporabniki) {
         if (err) {
             console.log(err);
@@ -224,7 +220,6 @@ module.exports.prijaviUporabnika = function (req, res, next) {
         else {
             req.session.trenutniUporabnik = null;
             for (i in uporabniki) {
-                console.log(uporabniki[i]);
                 //ce se email in geslo ujemata
                 if (uporabniki[i].email == email && bcrypt.compareSync(geslo,  uporabniki[i].geslo)) {
                     //shrani podatke v sejo
@@ -977,6 +972,12 @@ module.exports.ustvariNalogo = function (req, res, next) {
                 console.log(err);
                 return res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
             } else {
+                if (!req.body.newDialog && doc.status == false) {
+                    if (!oldDoc && doc.vezani_uporabniki) {
+                        sendMail(doc, doc.vezani_uporabniki);
+                        console.log("nova naloga");
+                    }
+                }
                 if (oldDoc && req.body.mode || sprememba == 1) { //če je naloga opravljena pošljem obvestilo uporabnikom
                     let podatki = doc ? doc : oldDoc;
                     let arr = podatki.vezani_uporabniki;
@@ -1318,11 +1319,30 @@ function truncate(string, num){
 };
 
 
-function sendMessage(number, text){
-    return smsapi.message
-        .sms()
-        .from('MyFamilyApp')
-        .to(number)
-        .message(text)
-        .execute(); // return Promise
+function sendMail(naloga, users) {
+    Uporabnik.find({ _id: { $in: users }, notf_email: true }, function (err, emailusers) {
+        if (err) {
+            console.log(error);
+            return;
+        }
+        for(let j = 0; j < emailusers.length; j++) {                        
+            let vsebina = 'Nova naloga:\n\n';
+                vsebina += "Ime: "+naloga[0].ime+"\nOpis: "+naloga[0].opis+"\nZačetek: "+moment(naloga[0].zacetek).format("D. M ob H:m")+
+                "\nKonec: "+moment(naloga[i].konec).format("D. M ob H:m")+"\nTočk: "+naloga[i].xp+"\n\n";
+            mailOptions = {
+                from: '"MyFamily mailer"'+process.env.mailUser,
+                to: '"Usr"'+emailusers[j].email,
+                subject: "Nova naloga",
+                text: vsebina,
+            }
+            console.log("Sending mail");
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });  
+        }
+    });
 }
