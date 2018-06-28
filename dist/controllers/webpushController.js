@@ -187,7 +187,7 @@ module.exports.prejmiKorake = function (req, res) {
 
 //** GET /api/druzina/:druzinaId
 module.exports.posljiDruzino = function (req, res) {
-  let object = {3 : "Vnuk/Vnukinja", 4: "Sin/Hči", 5:"Oče/Mati", 6:"Dedek/Babica", 7:"Pradedek/Prababica"};
+  
   let token = req.headers.token;
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
@@ -197,11 +197,10 @@ module.exports.posljiDruzino = function (req, res) {
           console.log(err);
           res.status(404).send(err);
         } else {
-          console.log(uporabniki);
+          let object = {3 : "Vnuk/Vnukinja", 4: "Sin/Hči", 5: "Oče/Mati", 6: "Dedek/Babica", 7: "Pradedek/Prababica"};
           for (let i=0;i<uporabniki.length;i++) {
-              uporabniki[i].polozaj = object[uporabniki[i].polozaj];
+              uporabniki[i].polozaj = object[""+uporabniki[i].polozaj+""];
           }
-          console.log(uporabniki);
           res.status(200).send(uporabniki);
         }
       });
