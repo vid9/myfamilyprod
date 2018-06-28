@@ -197,9 +197,10 @@ module.exports.posljiDruzino = function (req, res) {
           console.log(err);
           res.status(404).send(err);
         } else {
-          let object = {3 : "Vnuk/Vnukinja", 4: "Sin/Hči", 5: "Oče/Mati", 6: "Dedek/Babica", 7: "Pradedek/Prababica"};
+          let object = {"3" : "Vnuk/Vnukinja", "4" : "Sin/Hči", "5": "Oče/Mati", "6": "Dedek/Babica", "7": "Pradedek/Prababica"};
           for (let i=0;i<uporabniki.length;i++) {
-              uporabniki[i].polozaj = object[""+uporabniki[i].polozaj+""];
+              uporabniki[i].polozaj = object[uporabniki[i].polozaj];
+              console.log(object[uporabniki[i].polozaj]);
           }
           res.status(200).send(uporabniki);
         }
@@ -230,28 +231,7 @@ module.exports.prejmiNalogo = function (req, res) {
       if (err) {
           console.log(err);
           return res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
-          return;
-      } else {
-        if (doc) { //če je naloga opravljena pošljem obvestilo uporabnikom
-          let arr = doc.vezani_uporabniki;
-          let index = arr.indexOf(decoded._id);
-          if (index !== -1) arr.splice(index, 1);
-          Subscription.find({ user_id: arr }, function (err, sub) {
-              if (err) {
-                  console.log(err);
-                  return;
-              }
-              console.log(sub,"sub");
-              for(let m = 0; m < sub.length;m++) {
-                  const payload = JSON.stringify({
-                      title: 'Obvestilo',
-                      body: 'Naloga '+doc.ime+' je bila opravljena. Dobili ste '+doc.xp+' točk!',
-                      icon: 'images/f.ico'
-                  });
-                  triggerPushMsg(sub[m], payload);
-              }
-          });         
-        }     
+      } else {   
         let updt, upXp;
         if (doc) {
           updt = doc.vezani_uporabniki;
