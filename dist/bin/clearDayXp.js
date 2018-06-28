@@ -119,12 +119,12 @@ function sendMail() {
                             "\nKonec: "+moment(temp[m].konec).format("D. M ob H:m")+"\nTočk: "+temp[m].xp+"\n\n";
                         }
                         mailOptions = {
-                            from: '"MyFamily@"'+process.env.SPARKPOST_SANDBOX_DOMAIN,
-                            to: '"Usr"'+emailusers[j].email,
+                            from: 'MyFamily@'+process.env.SPARKPOST_SANDBOX_DOMAIN,
+                            to: emailusers[j].email,
                             subject: "Opomnik " + moment(new Date()).format('M. D'),
                             text: vsebina,
                         }
-                        console.log("Sending mail");
+                        console.log("Sending mail", mailOptions);
                         transporter.sendMail(mailOptions, function (error, info) {
                             if (error) {
                                 console.log(error);
