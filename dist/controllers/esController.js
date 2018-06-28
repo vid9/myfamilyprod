@@ -21,10 +21,11 @@ let nodemailer = require('nodemailer');
 let shortId = require('short-mongo-id');
 let webpush = require('web-push');
 
-let sparkPostTransport = require('nodemailer-sparkpost-transport')
+let sparkPostTransport = require('nodemailer-sparkpost-transport');
+
 let transporter = nodemailer.createTransport(sparkPostTransport({
   'sparkPostApiKey': process.env.SPARKPOST_API_KEY
-}))
+})) 
 
 /*
 let SMSAPI = require('smsapicom'),smsapi = new SMSAPI({
@@ -886,6 +887,7 @@ module.exports.izbrisiNalogo = function (req, res, next) {
                 res.status(400).end("Napaka! Naloga ni bila izbrisana.");
             }
             else {
+                console.log(doc);
                 if (doc.status == true){
                     Cilji.findOne({ _id: doc.vezan_cilj }, function (err, cilj) {
                         if (err) {
@@ -911,6 +913,8 @@ module.exports.izbrisiNalogo = function (req, res, next) {
                             res.status(200).end("Naloga je bila uspešno izbrisana!");
                         }
                     });
+                } else {
+                    res.status(200).end("Napaka!");
                 }
             }
         });
@@ -1358,7 +1362,7 @@ function sendMail(naloga, users) {
                 subject: "Nova naloga",
                 text: vsebina,
             }
-            console.log("Sending mail");
+            console.log("Sending mail", mailOptions);
             transporter.sendMail(mailOptions, function (error, info) {
                 if (error) {
                     console.log(error);
