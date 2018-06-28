@@ -12,6 +12,8 @@ let bcrypt = require('bcryptjs');
 
 let config = require('../config');
 
+let webpush = require('web-push');
+
 //** POST /api/save-subscription
 module.exports.dodajObvestila = function (req, res) {
     let isValidSaveRequest = (req, res) => {
@@ -229,6 +231,7 @@ module.exports.prejmiNalogo = function (req, res) {
           if (req.body.mode != "api") res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
           return;
       } else {
+        /*
         let arr = doc.vezani_uporabniki;
         let index = arr.indexOf(decoded._id);
         if (index !== -1) arr.splice(index, 1);
@@ -245,7 +248,7 @@ module.exports.prejmiNalogo = function (req, res) {
                   });
                   triggerPushMsg(sub[m], payload);
               }
-          });             
+          });    */         
           let updt = doc.vezani_uporabniki;
           let upXp = doc.xp;
           Uporabnik.update({ _id: { $in: updt } }, { $inc: { dayXp: upXp } }, { multi: true }, function (err, docs) {
