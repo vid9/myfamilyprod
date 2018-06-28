@@ -21,6 +21,11 @@ let nodemailer = require('nodemailer');
 let shortId = require('short-mongo-id');
 let webpush = require('web-push');
 
+let sparkPostTransport = require('nodemailer-sparkpost-transport')
+let transporter = nodemailer.createTransport(sparkPostTransport({
+  'sparkPostApiKey': process.env.SPARKPOST_API_KEY
+}))
+
 /*
 let SMSAPI = require('smsapicom'),smsapi = new SMSAPI({
     oauth: {
@@ -61,14 +66,6 @@ smsapi.authentication
     .then(sendMessage)
     .then(displayResult)
     .catch(displayError); */
-
-let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.mailUser,
-        pass: process.env.mailPass
-    }
-});
 
 function vrniNapako(res, err) {
     res.render("pages/error", { message: "Napaka pri poizvedbi /db", error: { status: 500, stack: err } });

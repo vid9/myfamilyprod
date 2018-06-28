@@ -11,14 +11,10 @@ let SMSAPI = require('smsapicom'),smsapi = new SMSAPI({
     }
 });
 let nodemailer = require('nodemailer');
-let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.mailUser,
-        pass: process.env.mailPass
-    }
-});
-
+let sparkPostTransport = require('nodemailer-sparkpost-transport')
+let transporter = nodemailer.createTransport(sparkPostTransport({
+  'sparkPostApiKey': process.env.SPARKPOST_API_KEY
+}))
 
 console.log("Deleting daily xp");
 deleteXP();
