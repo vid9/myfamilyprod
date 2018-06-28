@@ -197,9 +197,11 @@ module.exports.posljiDruzino = function (req, res) {
           console.log(err);
           res.status(404).send(err);
         } else {
+          console.log(uporabniki);
           for (let i=0;i<uporabniki.length;i++) {
               uporabniki[i].polozaj = object[uporabniki[i].polozaj];
           }
+          console.log(uporabniki);
           res.status(200).send(uporabniki);
         }
       });
