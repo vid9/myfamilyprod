@@ -884,12 +884,37 @@ module.exports.izbrisiNalogo = function (req, res, next) {
     if (checkIfLogged(res, req) != 0) return;
     //console.log(req.body);  
     if (req.body.id) {
-        Naloge.findOneAndRemove({ _id: req.body.id }, function (err) {
+        Naloge.findOneAndRemove({ _id: req.body.id }, function (err, doc) {
             if (err) {
                 res.status(400).end("Napaka! Naloga ni bila izbrisana.");
             }
             else {
-                res.status(200).end("Naloga je bila uspešno izbrisana!");
+                if (doc.status == true){
+                    Cilji.findOne({ _id: doc.vezan_cilj }, function (err, cilj) {
+                        if (err) {
+                            res.status(400).end("Napaka!");
+                        }
+                        else {
+                            let obj, curObj;
+                            if (cilj.vezani_uporabniki) obj = cilj.vezani_uporabniki.map(value => String(value.id_user));// uporabniki vezani na cilj
+                            else cilj.vezani_uporabniki = [];
+                            if(doc.vezani_uporabniki) curObj = doc.vezani_uporabniki.map(value => String(value)); //uporabniki vezani na nalogo
+                            console.log(curObj);
+                            for (let i = 0; i < curObj.length; i++) {
+                                let index = obj.indexOf(String(curObj[i]));
+                                if (index > -1) { //prištejem točke                         
+                                    cilj.vezani_uporabniki[index].xp_user = parseInt(cilj.vezani_uporabniki[index].xp_user) - parseInt(doc.xp);
+                                }                         
+                            }
+                            for (let i = cilj.vezani_uporabniki.length-1; i >= 0; i--) { // Če uporabnik nima xp ga odstranim
+                                if (cilj.vezani_uporabniki[i].xp_user == 0 ) {
+                                    cilj.vezani_uporabniki.splice(i,1);
+                                }
+                            }  
+                            res.status(200).end("Naloga je bila uspešno izbrisana!");
+                        }
+                    });
+                }
             }
         });
     }
@@ -974,6 +999,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
             } else {
                 if (!req.body.newDialog && doc.status == false) {
                     if (!oldDoc && doc.vezani_uporabniki) {
+                        console.log(doc);
                         sendMail(doc, doc.vezani_uporabniki);
                         console.log("nova naloga");
                     }
@@ -1327,7 +1353,7 @@ function sendMail(naloga, users) {
         }
         for(let j = 0; j < emailusers.length; j++) {                        
             let vsebina = 'Nova naloga:\n\n';
-                vsebina += "Ime: "+naloga.ime+"\nOpis: "+naloga[0].opis+"\nZačetek: "+moment(naloga.zacetek).format("D. M ob H:m")+
+                vsebina += "Ime: "+naloga.ime+"\nOpis: "+naloga.opis+"\nZačetek: "+moment(naloga.zacetek).format("D. M ob H:m")+
                 "\nKonec: "+moment(naloga.konec).format("D. M ob H:m")+"\nTočk: "+naloga.xp+"\n\n";
             mailOptions = {
                 from: '"MyFamily mailer"'+process.env.mailUser,
