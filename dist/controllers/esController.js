@@ -1365,7 +1365,7 @@ function sendSms(naloga, users, avtor) {
             "\nKonec: "+moment(naloga.konec).format("D. M ob H:mm")+"\nVrednost naloge: "+naloga.xp+"\n\n";
             console.log("sending sms");
             smsapi.authentication.login(process.env.SMSAPI_user, process.env.SMSAPI_pass)
-                .then(sendMessage("MyFamily", "+386"+parseInt(phoneUsr[j].telefon), vsebina))
+                .then(sendMessage("MyFamily", "386"+parseInt(phoneUsr[j].telefon), vsebina))
                 .then(displayResult)
                 .catch(displayError);
         }
