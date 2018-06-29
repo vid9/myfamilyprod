@@ -15,7 +15,7 @@ let moment = require('moment');
 let fs = require('fs');
 let mkdirp = require('mkdirp');
 let validator = require('validator');
-//let SMSAPI = require('smsapicom'), smsapi = new SMSAPI();;
+
 let nodemailer = require('nodemailer');
 let shortId = require('short-mongo-id');
 let webpush = require('web-push');
@@ -27,12 +27,14 @@ let transporter = nodemailer.createTransport(sparkPostTransport({
   'sparkPostApiKey': process.env.SPARKPOST_API_KEY
 }))
 
+let SMSAPI = require('smsapicom'), smsapi = new SMSAPI();
 
+/*
 let SMSAPI = require('smsapicom'),smsapi = new SMSAPI({
     oauth: {
         accessToken: process.env.SMSAPI_token
     }
-});
+});*/
 
 let color = { "5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5aeabcd8be609116280b4d9c": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3", "5aef78ab361f5244948ff58f": "#a3f7bf" };
 let urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -51,12 +53,7 @@ let once = 0;
 //let jobsCounter = 0;
 //let jobs = {};
 
-/*
-smsapi.authentication
-    .login(process.env.SMSAPI_user, process.env.SMSAPI_pass)
-    .then(sendMessage)
-    .then(displayResult)
-    .catch(displayError); */
+
 
 function vrniNapako(res, err) {
     res.render("pages/error", { message: "Napaka pri poizvedbi /db", error: { status: 500, stack: err } });
@@ -989,7 +986,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
             } else {
                 if (!req.body.newDialog && doc.status == false) {
                     if (!oldDoc && doc.vezani_uporabniki) {
-                        console.log(doc);
+                        console.log("posiljam obvestila");
                         sendMail(doc, doc.vezani_uporabniki);
                         sendSms(doc,doc.vezani_uporabniki);
                     }
@@ -1366,7 +1363,11 @@ function sendSms(naloga, users) {
             let vsebina = 'Nova naloga:\n\n';
                 vsebina += "Ime: "+naloga.ime+"\nOpis: "+naloga.opis+"\nZacetek: "+moment(naloga.zacetek).format("D. M ob H:m")+
                 "\nKonec: "+moment(naloga.konec).format("D. M ob H:m")+"\nTock: "+naloga.xp+"\n\n";
-            sendMessage("MyFamily", phoneUsr[i].telefon, vsebina).then(displayResult).then(displayError);
+                smsapi.authentication
+                    .login(process.env.SMSAPI_user, process.env.SMSAPI_pass)
+                    .then(sendMessage("MyFamily", "+386"+parseInt(phoneUsr[i].telefon), vsebina))
+                    .then(displayResult)
+                    .catch(displayError);
         }
     });
 }
