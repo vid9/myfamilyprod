@@ -22,10 +22,10 @@ let webpush = require('web-push');
 
 let sparkPostTransport = require('nodemailer-sparkpost-transport');
 
-
+/*
 let transporter = nodemailer.createTransport(sparkPostTransport({
   'sparkPostApiKey': process.env.SPARKPOST_API_KEY
-}))
+}))*/
 
 let SMSAPI = require('smsapicom'), smsapi = new SMSAPI();
 
@@ -1338,7 +1338,7 @@ function sendMail(naloga, users, avtor) {
             mailOptions = {
                 from: 'MyFamily@'+process.env.SPARKPOST_DOMAIN,
                 to: emailusers[j].email,
-                subject: "Nova naloga",
+                subject: "Nova naloga: "+naloga.ime,
                 text: vsebina,
             }
             console.log("Sending mail", mailOptions);
