@@ -944,7 +944,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
             if (req.body.oldCilj) if (!validator.isMongoId(req.body.oldCilj)) { vrniNapako(res, "Napačena oblika mongoId cilja!" + req.body.oldCilj); return false; }
             if (!req.body.dateZacetek) req.body.dateZacetek = new Date().toLocaleTimeString('sl-SI', { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", timeZoneName: "short" });
             if (!req.body.dateKonec) req.body.dateKonec = new Date().toLocaleTimeString('sl-SI', { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", timeZoneName: "short" });
-            if (!moment(req.body.dateZacetek).isSameOrBefore(req.body.dateKonec)) { vrniNapako(res, "Datum konca ne sme biti pred datumom začetka. " + req.body.dateZacetek + " " + req.body.dateKone); return; }
+            if (moment(req.body.dateZacetek).isSameOrBefore(req.body.dateKonec) == false) { vrniNapako(res, "Datum konca ne sme biti pred datumom začetka. " + req.body.dateZacetek + " " + req.body.dateKone); return; }
             if (req.body.dateZacetek == "") req.body.dateZacetek = dateNow();
             if (req.body.dateKonec == "") req.body.dateKonec = dateNow();
             novaNaloga.zacetek = req.body.dateZacetek;
@@ -987,8 +987,9 @@ module.exports.ustvariNalogo = function (req, res, next) {
                 if (!req.body.newDialog && doc.status == false) {
                     if (!oldDoc && doc.vezani_uporabniki) {
                         console.log("posiljam obvestila");
-                        sendMail(doc, doc.vezani_uporabniki, req.session.trenutniUporabnik);
-                        sendSms(doc,doc.vezani_uporabniki, req.session.trenutniUporabnik);
+                        sendSms(doc, doc.vezani_uporabniki, req.session.trenutniUporabnik);
+                        sendMail(doc, doc.vezani_uporabniki, req.session.trenutniUporabnik);     
+                        console.log("obvestila poslana");                   
                     }
                 }
                 if (doc.vezan_cilj) vCilj = doc.vezan_cilj;
@@ -1353,7 +1354,7 @@ function sendMail(naloga, users, avtor) {
     });
 }
 
-function sendSms(naloga, users) {
+function sendSms(naloga, users, avtor) {
     Uporabnik.find({ _id: { $in: users }, notf_telefon: true }, function (err, phoneUsr) {
         if (err) {
             console.log(error);
@@ -1365,7 +1366,7 @@ function sendSms(naloga, users) {
             "\nKonec: "+moment(naloga.konec).format("D. M ob H:mm")+"\nVrednost naloge: "+naloga.xp+"\n\n";
             console.log("sending sms");
             smsapi.authentication.login(process.env.SMSAPI_user, process.env.SMSAPI_pass)
-                .then(sendMessage("MyFamily", "+386"+parseInt(phoneUsr[i].telefon), vsebina))
+                .then(sendMessage("MyFamily", "+386"+parseInt(phoneUsr[j].telefon), vsebina))
                 .then(displayResult)
                 .catch(displayError);
         }
