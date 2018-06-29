@@ -1010,8 +1010,8 @@ module.exports.ustvariNalogo = function (req, res, next) {
                             const payload = JSON.stringify({
                                 title: 'Obvestilo',
                                 body: 'Naloga '+podatki.ime+' je bila opravljena. Dobili ste '+podatki.xp+' točk!',
-                                icon: '/images/f.ico',
-                                badge: '/images/f.ico'
+                                icon: 'app/public/images/f.ico',
+                                badge: 'app/public/images/f.ico'
                             });
                             triggerPushMsg(sub[m], payload);
                         }
