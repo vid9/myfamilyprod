@@ -23,10 +23,10 @@ let webpush = require('web-push');
 
 let sparkPostTransport = require('nodemailer-sparkpost-transport');
 
+
 let transporter = nodemailer.createTransport(sparkPostTransport({
   'sparkPostApiKey': process.env.SPARKPOST_API_KEY
 })) 
-
 
 let SMSAPI = require('smsapicom'),smsapi = new SMSAPI({
     oauth: {
@@ -1106,7 +1106,6 @@ module.exports.ustvariNalogo = function (req, res, next) {
                             if (cilj.vezani_uporabniki) obj = cilj.vezani_uporabniki.map(value => String(value.id_user));// uporabniki že vezani na cilj
                             else cilj.vezani_uporabniki = [];
                             if(doc.vezani_uporabniki) curObj = doc.vezani_uporabniki.map(value => String(value)); //uporabniki vezani na nalogo
-                            console.log(curObj);
                             for (let i = 0; i < curObj.length; i++) {
                                 let index = obj.indexOf(String(curObj[i]));
                                 if (index > -1) { //prištejem točke                         
@@ -1133,9 +1132,9 @@ module.exports.ustvariNalogo = function (req, res, next) {
                             obj = {};                       
                             if (cilj.vezane_naloge) obj = cilj.vezane_naloge.map(value => String(value.id_nal));
                             if (obj) {
-                               ind = obj.indexOf(doc._id);
+                               ind = obj.indexOf(String(doc._id));
                             }
-                            console.log(doc.status, "status");
+                            console.log(obj, "vezane naloge");
                             if (ind > -1) {
                                 cilj.vezane_naloge[ind].stanje = doc.status;
                                 console.log("naloga obstaja", ind);
