@@ -23,10 +23,11 @@ let webpush = require('web-push');
 
 let sparkPostTransport = require('nodemailer-sparkpost-transport');
 
-
+/*
 let transporter = nodemailer.createTransport(sparkPostTransport({
   'sparkPostApiKey': process.env.SPARKPOST_API_KEY
-})) 
+})) */
+
 
 let SMSAPI = require('smsapicom'),smsapi = new SMSAPI({
     oauth: {
@@ -994,6 +995,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                         sendSms(doc,doc.vezani_uporabniki);
                     }
                 }
+                if (doc.vezan_cilj) vCilj = doc.vezan_cilj;
                 if (oldDoc && req.body.mode || sprememba == 1) { //če je naloga opravljena pošljem obvestilo uporabnikom
                     let podatki = doc ? doc : oldDoc;
                     let arr = podatki.vezani_uporabniki;
@@ -1010,8 +1012,8 @@ module.exports.ustvariNalogo = function (req, res, next) {
                             const payload = JSON.stringify({
                                 title: 'Obvestilo',
                                 body: 'Naloga '+podatki.ime+' je bila opravljena. Dobili ste '+podatki.xp+' točk!',
-                                icon: 'app/public/images/f.ico',
-                                badge: 'app/public/images/f.ico'
+                                icon: '/public/images/f.ico',
+                                badge: '/public/images/f.ico'
                             });
                             triggerPushMsg(sub[m], payload);
                         }
@@ -1095,7 +1097,6 @@ module.exports.ustvariNalogo = function (req, res, next) {
                     Cilji.findOne({ _id: doc.vezan_cilj }, function (err, cilj) {
                         if (!err) {
                             currXp = doc.xp;
-                            // če je prejšenj cilj različen
                             if (req.body.oldCilj != req.body.sampleCilj) {
                                 if (req.body.newStatus == "false") currXp =  0;
                             } else {
@@ -1129,18 +1130,18 @@ module.exports.ustvariNalogo = function (req, res, next) {
                                 }
                             }
                             if (req.body.oldCilj == req.body.sampleCilj) {cilj.xp = parseInt(cilj.xp) + parseInt(currXp);}
-                            else if (doc.status) cilj.xp = parseInt(cilj.xp) + parseInt(doc.xp);
+                            else if (doc.status) {
+                                cilj.xp = parseInt(cilj.xp) + parseInt(doc.xp);
+                                console.log("naloga +"+doc.xp);
+                            }
                             obj = {};                       
                             if (cilj.vezane_naloge) obj = cilj.vezane_naloge.map(value => String(value.id_nal));
                             if (obj) {
                                ind = obj.indexOf(String(doc._id));
                             }
-                            //console.log(obj, "vezane naloge");
                             if (ind > -1) {
                                 cilj.vezane_naloge[ind].stanje = doc.status;
-                                //console.log("naloga obstaja", ind);
                             } else {
-                                //console.log("naloga ni pod ciljem", ind);
                                 cilj.vezane_naloge.push({ "id_nal": doc._id, "stanje": doc.status });
                             }                            
                             cilj.save(function (err) {
