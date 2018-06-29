@@ -199,7 +199,7 @@ module.exports.posljiDruzino = function (req, res) {
         } else {
           let obj = {3 : "Vnuk/Vnukinja", 4 : "Sin/Hči", 5: "Oče/Mati", 6: "Dedek/Babica", 7: "Pradedek/Prababica"};
           for (let i=0;i<uporabniki.length;i++) {
-              uporabniki[i][polozaj] = obj[uporabniki[i][polozaj]];
+              uporabniki[i].polozaj = obj[uporabniki[i].polozaj];
               console.log(obj[uporabniki[i].polozaj]);
           }
           res.status(200).send(uporabniki);
