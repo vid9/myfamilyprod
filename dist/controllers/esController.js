@@ -811,9 +811,9 @@ module.exports.povabiUporabnika = function (req, res, next) {
     if (!validator.isEmail(req.body.invite_email)) { vrniNapako(res, "Vpisan email ni ustrezen. " + req.body.invite_email); return false; }
     //console.log(req.body.invite_email);
     var mailOptions = {
-        from: process.env.mailUser,
+        from: 'MyFamily@'+process.env.SPARKPOST_DOMAIN,
         to: req.body.invite_email,
-        subject: 'MyFamily povabilo'
+        subject: "MyFamily vabilo",
     };
     mailOptions.html = '<p><h1>Pozdravljen!</h1>Vabim te, da se mi pridužiš kot član družine v aplikaciji MyFamily.<br/><br/>Najprej se registriraj na ' +
         '<a href="https://ekosmartweb.herokuapp.com/prijava">spletni strani</a>, nato se prijavi v aplikacijo in klikni na spodnjo povezavo.<br/><br/>' +
