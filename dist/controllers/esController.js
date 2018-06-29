@@ -1096,12 +1096,11 @@ module.exports.ustvariNalogo = function (req, res, next) {
                             currXp = doc.xp;
                             // če je prejšenj cilj različen
                             if (req.body.oldCilj != req.body.sampleCilj) {
-                                currXp = (req.body.newStatus == "false") ? 0 : doc.xp;
+                                if (req.body.newStatus == "false") currXp =  0;
                             } else {
-                                if (req.body.oldStatus == "true" && req.body.newStatus == "false") currXp = 0;
-                                else if (req.body.oldStatus == "false" && req.body.newStatus == "false") currXp = oldDoc.xp-doc.xp;
+                                if (req.body.oldStatus == "true" && req.body.newStatus == "false") currXp = -oldDoc.xp;
+                                else if (req.body.oldStatus == "false" && req.body.newStatus == "false") currXp = 0;
                                 else if (req.body.oldStatus == "true" && req.body.newStatus == "true") currXp = doc.xp-oldDoc.xp;
-                                else if (req.body.oldStatus == "false" && req.body.newStatus == "true") currXp = -doc.xp;
                             }
                             let obj= {}, curObj= {}, ind;
                             if (cilj.vezani_uporabniki) obj = cilj.vezani_uporabniki.map(value => String(value.id_user));// uporabniki že vezani na cilj
@@ -1139,7 +1138,9 @@ module.exports.ustvariNalogo = function (req, res, next) {
                             console.log(doc.status, "status");
                             if (ind > -1) {
                                 cilj.vezane_naloge[ind].stanje = doc.status;
+                                console.log("naloga obstaja", ind);
                             } else {
+                                console.log("naloga ni pod ciljem", ind);
                                 cilj.vezane_naloge.push({ "id_nal": doc._id, "stanje": doc.status });
                             }                            
                             cilj.save(function (err) {
