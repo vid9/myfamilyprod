@@ -29,7 +29,7 @@ self.addEventListener('push', function(event) {
     const title = event.data.json().title;
     const options = {
         body: event.data.json().body,
-        icon: 'public/images/f.ico',
+        icon: '../public/images/f.ico',
         vibrate: [60, 30, 60],
         data: {
             dateOfArrival: Date.now(),
