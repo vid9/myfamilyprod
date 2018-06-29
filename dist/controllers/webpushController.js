@@ -98,12 +98,14 @@ module.exports.posljiToken = function (req, res) {
           let token = jwt.sign({ id: uporabniki[0]._id }, config.secret, {    // create a token
             expiresIn: 86400 // expires in 24 hours
           });
+          let obj = {3 : "Vnuk/Vnukinja", 4 : "Sin/Hči", 5: "Oče/Mati", 6: "Dedek/Babica", 7: "Pradedek/Prababica"};
           user.auth = true;
           user.token = token;
           user._id  = uporabniki[0]._id;
           user.email = uporabniki[0].email;
           user.ime =  uporabniki[0].ime;
           user.druzina = uporabniki[0].druzina;
+          user.polozaj = obj[uporabniki[0].polozaj];
           user.telefon = uporabniki[0].telefon;
           user.slika = uporabniki[0].slika;
           res.status(200).send(user);
@@ -201,8 +203,6 @@ module.exports.posljiDruzino = function (req, res) {
           let obj = {3 : "Vnuk/Vnukinja", 4 : "Sin/Hči", 5: "Oče/Mati", 6: "Dedek/Babica", 7: "Pradedek/Prababica"};
           for (let i=0;i<uporabniki.length;i++) {
             newObj.push({_id : uporabniki[i]._id, ime : uporabniki[i].ime, druzina: uporabniki[i].druzina, polozaj: obj[uporabniki[i].polozaj], slika: uporabniki[i].slika});
-            /* uporabniki[i].polozajString = obj[uporabniki[i].polozaj];*/
-              console.log(obj[uporabniki[i].polozaj]);
           }
           res.status(200).send(newObj);
         }
