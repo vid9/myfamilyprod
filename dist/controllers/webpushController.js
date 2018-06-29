@@ -197,10 +197,10 @@ module.exports.posljiDruzino = function (req, res) {
           console.log(err);
           res.status(404).send(err);
         } else {
-          let object = {"3" : "Vnuk/Vnukinja", "4" : "Sin/Hči", "5": "Oče/Mati", "6": "Dedek/Babica", "7": "Pradedek/Prababica"};
+          let obj = {3 : "Vnuk/Vnukinja", 4 : "Sin/Hči", 5: "Oče/Mati", 6: "Dedek/Babica", 7: "Pradedek/Prababica"};
           for (let i=0;i<uporabniki.length;i++) {
-              uporabniki[i].polozaj = object[uporabniki[i].polozaj];
-              console.log(object[uporabniki[i].polozaj]);
+              uporabniki[i][polozaj] = obj[uporabniki[i][polozaj]];
+              console.log(obj[uporabniki[i].polozaj]);
           }
           res.status(200).send(uporabniki);
         }
@@ -249,8 +249,8 @@ module.exports.prejmiNalogo = function (req, res) {
           let obj = {}, curObj = {};
         Cilji.findOne({ _id: doc.vezan_cilj }, function (err, cilj) {
           if (!err) {
-              obj = cilj.vezani_uporabniki.map(value => String(value.id_user));
-              curObj = doc.vezani_uporabniki.map(value => String(value));
+              if(cilj.vezani_uporabniki) obj = cilj.vezani_uporabniki.map(value => String(value.id_user));
+              if(doc.vezani_uporabniki) curObj = doc.vezani_uporabniki.map(value => String(value));
               for (let i = 0; i < curObj.length; i++) {
                   let index = obj.indexOf(String(curObj[i]));
                   if (index > -1) { //prištejem točke                               
