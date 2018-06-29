@@ -15,18 +15,17 @@ let moment = require('moment');
 let fs = require('fs');
 let mkdirp = require('mkdirp');
 let validator = require('validator');
-//let SMSAPI = require('smsapicom'), smsapi = new SMSAPI();
-//let CronJob = require('cron').CronJob;
+//let SMSAPI = require('smsapicom'), smsapi = new SMSAPI();;
 let nodemailer = require('nodemailer');
 let shortId = require('short-mongo-id');
 let webpush = require('web-push');
 
 let sparkPostTransport = require('nodemailer-sparkpost-transport');
 
-/*
+
 let transporter = nodemailer.createTransport(sparkPostTransport({
   'sparkPostApiKey': process.env.SPARKPOST_API_KEY
-})) */
+}))
 
 
 let SMSAPI = require('smsapicom'),smsapi = new SMSAPI({
@@ -1213,14 +1212,6 @@ function dateNow() {
     if (mm < 10) mm = '0' + mm;
     today = yyyy + '-' + mm + '-' + dd;
     return today;
-}
-
-function ustvariKljuc() {
-    return 121;
-}
-
-function poisciCilj() {
-    return new ObjectId();
 }
 
 function posodobiJson(obj, session) {
