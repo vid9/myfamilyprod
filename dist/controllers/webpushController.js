@@ -121,7 +121,7 @@ module.exports.posljiNaloge = function (req, res) {
   let token = req.headers.token;
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
-      if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
       query = { vezani_uporabniki: {$in: [mongoose.Types.ObjectId(req.params.userId)]}};
       Naloge.find(query, function (err, doc) {
         if (err) {
@@ -143,7 +143,7 @@ module.exports.posljiCilje = function (req, res) {
   let token = req.headers.token;
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
-      if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
       query = { "vezani_uporabniki.id_user" : {$in: [mongoose.Types.ObjectId(req.params.userId)]}};
       Cilji.find(query, function (err, doc) {
         if (err) {
@@ -177,7 +177,7 @@ module.exports.prejmiKorake = function (req, res) {
   let token = req.headers.token;
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
-      if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
       res.status(200).send(req.body);
     });
   } else {
@@ -191,18 +191,20 @@ module.exports.posljiDruzino = function (req, res) {
   let token = req.headers.token;
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
-      if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
       Uporabnik.find({druzina: req.params.druzinaId},{ id: 1, ime: 1, druzina: 1, polozaj: 1, slika: 1}, function (err, uporabniki) {
         if (err) {
           console.log(err);
           res.status(404).send(err);
         } else {
+          let newObj = [];
           let obj = {3 : "Vnuk/Vnukinja", 4 : "Sin/Hči", 5: "Oče/Mati", 6: "Dedek/Babica", 7: "Pradedek/Prababica"};
           for (let i=0;i<uporabniki.length;i++) {
-              uporabniki[i].polozajString = obj[uporabniki[i].polozaj];
+            newObj.push({_id : uporabniki[i]._id, ime : uporabniki[i].ime, druzina: uporabniki[i].druzina, polozaj: obj[uporabniki[i].polozaj], slika: uporabniki[i].slika});
+            /* uporabniki[i].polozajString = obj[uporabniki[i].polozaj];*/
               console.log(obj[uporabniki[i].polozaj]);
           }
-          res.status(200).send(uporabniki);
+          res.status(200).send(newObj);
         }
       });
     });
@@ -212,17 +214,12 @@ module.exports.posljiDruzino = function (req, res) {
 };
 
 
-
-
-
-
-
 //** POST /api/naloga/:idNaloge
 module.exports.prejmiNalogo = function (req, res) {
   let token = req.headers.token;
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
-      if (err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
       let novaNaloga = {
         status: true,
       };
