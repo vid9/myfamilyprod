@@ -29,7 +29,7 @@ self.addEventListener('push', function(event) {
     const title = event.data.json().title;
     const options = {
         body: event.data.json().body,
-        icon: 'images/f.ico',
+        icon: 'public/images/f.ico',
         vibrate: [60, 30, 60],
         data: {
             dateOfArrival: Date.now(),
@@ -45,6 +45,6 @@ self.addEventListener('notificationclick', function(event) {
     event.notification.close();
 
     event.waitUntil(
-        clients.openWindow('localhost:3000/prijava')
+        clients.openWindow('https://ekosmartweb.herokuapp.com/prijava')
     );
 });

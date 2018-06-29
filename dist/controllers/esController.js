@@ -1112,7 +1112,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                                     cilj.vezani_uporabniki[index].xp_user = parseInt(cilj.vezani_uporabniki[index].xp_user) + parseInt(currXp);
                                 } else {  //Če uporabnik še ni v cilju, ga dodam                                 
                                     cilj.vezani_uporabniki.push({ "id_user": curObj[i], "xp_user": doc.status ? doc.xp : 0 });
-                                    console.log({ "id_user": curObj[i], "xp_user": doc.status ? doc.xp : 0 });
+                                    //console.log({ "id_user": curObj[i], "xp_user": doc.status ? doc.xp : 0 });
                                 }                          
                             }
                             let difference = obj.filter(x => !curObj.includes(x));                        
@@ -1134,12 +1134,12 @@ module.exports.ustvariNalogo = function (req, res, next) {
                             if (obj) {
                                ind = obj.indexOf(String(doc._id));
                             }
-                            console.log(obj, "vezane naloge");
+                            //console.log(obj, "vezane naloge");
                             if (ind > -1) {
                                 cilj.vezane_naloge[ind].stanje = doc.status;
-                                console.log("naloga obstaja", ind);
+                                //console.log("naloga obstaja", ind);
                             } else {
-                                console.log("naloga ni pod ciljem", ind);
+                                //console.log("naloga ni pod ciljem", ind);
                                 cilj.vezane_naloge.push({ "id_nal": doc._id, "stanje": doc.status });
                             }                            
                             cilj.save(function (err) {
