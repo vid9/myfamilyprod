@@ -231,7 +231,6 @@ module.exports.prijaviUporabnika = function (req, res, next) {
                     break;
                 }
             }
-            console.log(req.session.trenutniUporabnik);
             if (req.session.trenutniUporabnik) {
                 res.redirect("/");
             } else {
@@ -1099,9 +1098,10 @@ module.exports.ustvariNalogo = function (req, res, next) {
                             if (req.body.oldCilj != req.body.sampleCilj) {
                                 currXp = (req.body.newStatus == "false") ? 0 : doc.xp;
                             } else {
-                                if (req.body.newStatus == "false" && req.body.oldStatus == "true") currXp = 0;
+                                if (req.body.oldStatus == "true" && req.body.newStatus == "false") currXp = 0;
                                 else if (req.body.oldStatus == "false" && req.body.newStatus == "false") currXp = oldDoc.xp-doc.xp;
                                 else if (req.body.oldStatus == "true" && req.body.newStatus == "true") currXp = doc.xp-oldDoc.xp;
+                                else if (req.body.oldStatus == "false" && req.body.newStatus == "true") currXp = -doc.xp;
                             }
                             let obj= {}, curObj= {}, ind;
                             if (cilj.vezani_uporabniki) obj = cilj.vezani_uporabniki.map(value => String(value.id_user));// uporabniki že vezani na cilj
@@ -1120,7 +1120,6 @@ module.exports.ustvariNalogo = function (req, res, next) {
                             let difference = obj.filter(x => !curObj.includes(x));                        
                             if (req.body.oldStatus) { //Uporabnikom, ki niso več pod nalogo odšetejem točke
                                 for(let i=0;i<difference.length;i++) {
-                                    console.log("odstevam tocke");
                                     let index = obj.indexOf(difference[i]);
                                     cilj.vezani_uporabniki[index].xp_user = parseInt(cilj.vezani_uporabniki[index].xp_user) - parseInt(doc.xp);
                                 }
