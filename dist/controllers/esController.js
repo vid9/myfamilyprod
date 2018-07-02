@@ -22,13 +22,13 @@ let webpush = require('web-push');
 
 let sparkPostTransport = require('nodemailer-sparkpost-transport');
 
-
+/*
 let transporter = nodemailer.createTransport(sparkPostTransport({
   'sparkPostApiKey': process.env.SPARKPOST_API_KEY
-}))
+}))*/
 
-//let SMSAPI = require('smsapicom'), smsapi = new SMSAPI();
 
+let latinize = require('latinize');
 let SMSAPI = require('smsapicom'),
     smsapi = new SMSAPI({
         oauth: {
@@ -36,15 +36,14 @@ let SMSAPI = require('smsapicom'),
         }
     });
 
+let color = {"5a785125e7c9722aa0e1e8ac": "#FEC3BF",
+"5aeabcd8be609116280b4d9c": "#FFDDB9",
+"5aef78ab361f5244948ff58f": "#97EBED",
+"5a78505d19ac7744c8175d18": "#A5D8F3",
+"5b34a331e6512b13c0889d93": "#a3f7bf",
+"5a785178900a3b278c196667": "#ffb8ff"}
 
-/*
-let SMSAPI = require('smsapicom'),smsapi = new SMSAPI({
-    oauth: {
-        accessToken: process.env.SMSAPI_token
-    }
-});*/
-
-let color = { "5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5aeabcd8be609116280b4d9c": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3", "5aef78ab361f5244948ff58f": "#a3f7bf" };
+//let color = { "5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5aeabcd8be609116280b4d9c": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3", "5aef78ab361f5244948ff58f": "#a3f7bf" };
 let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 bcrypt = require('bcryptjs');
@@ -54,14 +53,6 @@ webpush.setVapidDetails(
     'BGa5M248kds3Uw6AkR6igb3aq4OQw1zFmSBNuFj10kwdsqZ8DXoYtvLUPCMsUIpMKQiPzdOY-s-3mkVnPhRUiQg' || process.env.VAPID_PUBLIC_KEY,
     'Ue3ZsN1R_48R17QCxR4vZHuNQu9gKspmVIVMwai-hPQ' || process.env.VAPID_PRIVATE_KEY
   );
-
-let once = 0;
-
-
-//let jobsCounter = 0;
-//let jobs = {};
-
-
 
 function vrniNapako(res, err) {
     res.render("pages/error", { message: "Napaka pri poizvedbi /db", error: { status: 500, stack: err } });
@@ -1375,15 +1366,9 @@ function sendSms(naloga, users, avtor) {
             vsebina += "Ime: "+naloga.ime+"\nOpis: "+naloga.opis+"\nZačetek: "+moment(naloga.zacetek).format("D. M ob H:mm")+
             "\nKonec: "+moment(naloga.konec).format("D. M ob H:mm")+"\nVrednost naloge: "+naloga.xp+"\n\n";
             console.log(vsebina);
-            sendMessage("MyFamily", "386"+parseInt(phoneUsr[j].telefon), vsebina)
+            sendMessage("MyFamily", "386"+parseInt(phoneUsr[j].telefon), latinize(vsebina))
                 .then(displayResult)
                 .catch(displayError);
-            /*
-            smsapi.authentication.login(process.env.SMSAPI_user,process.env.SMSAPI_pass)
-                .then(sendMessage("MyFamily", "386"+parseInt(phoneUsr[j].telefon), vsebina))
-                .then(displayResult)
-                .catch(displayError);
-                */
         }
         console.log("smsSent");
     });
