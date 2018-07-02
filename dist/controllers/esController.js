@@ -22,12 +22,20 @@ let webpush = require('web-push');
 
 let sparkPostTransport = require('nodemailer-sparkpost-transport');
 
-/*
+
 let transporter = nodemailer.createTransport(sparkPostTransport({
   'sparkPostApiKey': process.env.SPARKPOST_API_KEY
-}))*/
+}))
 
-let SMSAPI = require('smsapicom'), smsapi = new SMSAPI();
+//let SMSAPI = require('smsapicom'), smsapi = new SMSAPI();
+
+let SMSAPI = require('smsapicom'),
+    smsapi = new SMSAPI({
+        oauth: {
+            accessToken:  process.env.SMSAPI_token
+        }
+    });
+
 
 /*
 let SMSAPI = require('smsapicom'),smsapi = new SMSAPI({
@@ -288,6 +296,7 @@ module.exports.posodobiOsebnePodatke = function (req, res, next) {
 //** POST /notifications
 module.exports.posodobiObvestila = function (req, res, next) {
     if (checkIfLogged(res, req) != 0) return;
+    console.log(req.body);
     let mail = false, tel = false;
     req.session.trenutniUporabnik.notf_email = false;
     req.session.trenutniUporabnik.notf_telefon = false;
@@ -987,7 +996,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                     if (!oldDoc && doc.vezani_uporabniki) {
                         console.log("posiljam obvestila");
                         sendSms(doc, doc.vezani_uporabniki, req.session.trenutniUporabnik);
-                        sendMail(doc, doc.vezani_uporabniki, req.session.trenutniUporabnik);     
+                        //sendMail(doc, doc.vezani_uporabniki, req.session.trenutniUporabnik);     
                         console.log("obvestila poslana");                   
                     }
                 }
@@ -1359,15 +1368,23 @@ function sendSms(naloga, users, avtor) {
             console.log(error);
             return;
         }
+        console.log(users, "users");
+        console.log(phoneUsr, "uporabniki");
         for(let j = 0; j < phoneUsr.length; j++) {                        
             let vsebina = 'Uporabnik '+avtor.ime+' je v aplikaciji ustvaril novo nalogo:\n\n';
             vsebina += "Ime: "+naloga.ime+"\nOpis: "+naloga.opis+"\nZačetek: "+moment(naloga.zacetek).format("D. M ob H:mm")+
             "\nKonec: "+moment(naloga.konec).format("D. M ob H:mm")+"\nVrednost naloge: "+naloga.xp+"\n\n";
-            console.log("sending sms");
-            smsapi.authentication.login(process.env.SMSAPI_user, process.env.SMSAPI_pass)
+            console.log(vsebina);
+            sendMessage("MyFamily", "386"+parseInt(phoneUsr[j].telefon), vsebina)
+                .then(displayResult)
+                .catch(displayError);
+            /*
+            smsapi.authentication.login(process.env.SMSAPI_user,process.env.SMSAPI_pass)
                 .then(sendMessage("MyFamily", "386"+parseInt(phoneUsr[j].telefon), vsebina))
                 .then(displayResult)
                 .catch(displayError);
+                */
         }
+        console.log("smsSent");
     });
 }
