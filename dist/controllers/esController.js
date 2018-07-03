@@ -22,10 +22,10 @@ let webpush = require('web-push');
 
 let sparkPostTransport = require('nodemailer-sparkpost-transport');
 
-/*
+
 let transporter = nodemailer.createTransport(sparkPostTransport({
   'sparkPostApiKey': process.env.SPARKPOST_API_KEY
-}))*/
+}))
 
 
 let latinize = require('latinize');
@@ -1043,7 +1043,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                     if (!oldDoc && doc.vezani_uporabniki) {
                         console.log("posiljam obvestila");
                         sendSms(doc, doc.vezani_uporabniki, req.session.trenutniUporabnik);
-                        //sendMail(doc, doc.vezani_uporabniki, req.session.trenutniUporabnik);     
+                        sendMail(doc, doc.vezani_uporabniki, req.session.trenutniUporabnik);     
                         console.log("obvestila poslana");                   
                     }
                 }
