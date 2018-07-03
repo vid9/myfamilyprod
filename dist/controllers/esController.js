@@ -36,12 +36,12 @@ let SMSAPI = require('smsapicom'),
         }
     });
 
-let color = {"5a785125e7c9722aa0e1e8ac": "#FEC3BF",
-"5aeabcd8be609116280b4d9c": "#FFDDB9",
-"5aef78ab361f5244948ff58f": "#97EBED",
-"5a78505d19ac7744c8175d18": "#A5D8F3",
-"5b34a331e6512b13c0889d93": "#a3f7bf",
-"5a785178900a3b278c196667": "#ffb8ff"}
+let color = {"5a785125e7c9722aa0e1e8ac": "#97EBED" ,
+"5aeabcd8be609116280b4d9c": "#A5D8F3",
+"5aef78ab361f5244948ff58f": "#a3f7bf",
+"5a78505d19ac7744c8175d18": "#FFDDB9",
+"5b34a331e6512b13c0889d93": "#ffb8ff",
+"5a785178900a3b278c196667": "#FEC3BF" }
 
 //let color = { "5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5aeabcd8be609116280b4d9c": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3", "5aef78ab361f5244948ff58f": "#a3f7bf" };
 let urlencodedParser = bodyParser.urlencoded({ extended: false });
