@@ -16,7 +16,7 @@
                                 <p class="mdl-color-text--red util-center"><%= sporociloPrijava %></h4>
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col <% if (sporociloPrijava) { %>is-invalid<% } %>">
                                     <label class="mdl-textfield__label" for="textfield_email">E-mail</label>
-                                    <input class="mdl-textfield__input" type="email" id="textfield_email" name="email" autocomplete="on" oninvalid="this.setCustomValidity('Prosimo vključite @ v email naslov!')"/>
+                                    <input class="mdl-textfield__input" type="email" id="textfield_email" name="email" autocomplete="on" oninput="checkMail(this)"/>
                                     <span class="mdl-textfield__error" id="emailErr"></span>
                                 </div>
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col <% if (sporociloPrijava) { %>is-invalid<% } %>">
@@ -62,13 +62,13 @@
                             <input type="hidden" name="action" value="register"/>
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col">
                                 <label class="mdl-textfield__label" for="reg_email">E-mail*</label>
-                                <input class="mdl-textfield__input" type="email" id="reg_email" name="reg_email" oninvalid="this.setCustomValidity('Prosimo vključite @ v elektronski naslov!')"/>
+                                <input class="mdl-textfield__input" type="email" id="reg_email" name="reg_email" oninput="checkMail(this)"/>
                                 <span class="mdl-textfield__error" id="errEmail">Vpisani e-poštni naslov je napačen</span>
                             </div>
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col">
                                 <label class="mdl-textfield__label" for="reg_password">Geslo*</label>
-                                <input class="mdl-textfield__input" type="password" id="reg_password" name="reg_password"/>
-                                <span class="mdl-textfield__error" id="errPass">Gesli se ne ujemata!</span>
+                                <input class="mdl-textfield__input" type="password" id="reg_password" name="reg_password" pattern=".{6,}"/>
+                                <span class="mdl-textfield__error" id="errPass">Geslo mora vsebovati vsaj 6 znakov!</span>
                             </div>
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col">
                                 <label class="mdl-textfield__label" for="reg_password_confirm">Potrditev gesla*</label>
