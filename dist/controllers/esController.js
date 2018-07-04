@@ -11,7 +11,8 @@ let async = require('async');
 let ObjectId = mongoose.Types.ObjectId;
 let bodyParser = require('body-parser');
 let ejs = require('ejs');
-let moment = require('moment');
+//let moment = require('moment');
+var moment = require('moment-timezone');
 let fs = require('fs');
 let mkdirp = require('mkdirp');
 let validator = require('validator');
@@ -27,6 +28,7 @@ let transporter = nodemailer.createTransport(sparkPostTransport({
   'sparkPostApiKey': process.env.SPARKPOST_API_KEY || "stringkiniapikey"
 }))
 
+moment.tz.setDefault('Europe/Vienna');
 
 let latinize = require('latinize');
 let SMSAPI = require('smsapicom'),

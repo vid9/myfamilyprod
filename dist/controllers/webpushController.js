@@ -6,6 +6,7 @@ let Naloge = mongoose.model("Naloge");
 let Cilji = mongoose.model("Cilji");
 let Uporabnik = mongoose.model("Uporabnik");
 let Kategorija = mongoose.model("Kategorija");
+let Koraki = mongoose.model("Koraki");
 
 let jwt = require('jsonwebtoken');
 let bcrypt = require('bcryptjs');
@@ -13,6 +14,7 @@ let bcrypt = require('bcryptjs');
 let config = require('../config');
 
 let webpush = require('web-push');
+let moment = require('moment');
 
 //** POST /api/save-subscription
 module.exports.dodajObvestila = function (req, res) {
@@ -180,8 +182,15 @@ module.exports.prejmiKorake = function (req, res) {
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
       if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
-      res.status(200).send(req.body);
-    });
+      Koraki.find(function (err) {
+        if (err) {
+          console.log(err);
+          res.status(404).send(err);
+        } else {
+          res.status(200).send(req.body);
+        }
+      });      
+    }); 
   } else {
     res.status(401).send({ auth: false, message: 'No token provided.' });  
   }

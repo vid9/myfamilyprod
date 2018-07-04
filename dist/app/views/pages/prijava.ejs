@@ -17,7 +17,7 @@
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col <% if (sporociloPrijava) { %>is-invalid<% } %>">
                                     <label class="mdl-textfield__label" for="textfield_email">E-mail</label>
                                     <input class="mdl-textfield__input" type="email" id="textfield_email" name="email" autocomplete="on" oninput="checkMail(this)"/>
-                                    <span class="mdl-textfield__error" id="emailErr"></span>
+                                    <span class="mdl-textfield__error" id="emailErr">Vpisani email ni pravilen!</span>
                                 </div>
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col <% if (sporociloPrijava) { %>is-invalid<% } %>">
                                     <label class="mdl-textfield__label" for="textfield_password">Geslo</label>
@@ -63,7 +63,7 @@
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col">
                                 <label class="mdl-textfield__label" for="reg_email">E-mail*</label>
                                 <input class="mdl-textfield__input" type="email" id="reg_email" name="reg_email" oninput="checkMail(this)"/>
-                                <span class="mdl-textfield__error" id="errEmail">Vpisani e-poštni naslov je napačen</span>
+                                <span class="mdl-textfield__error" id="errEmail">Vpisani email ne ustreza formatu!</span>
                             </div>
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col">
                                 <label class="mdl-textfield__label" for="reg_password">Geslo*</label>
