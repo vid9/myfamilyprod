@@ -24,7 +24,7 @@ let sparkPostTransport = require('nodemailer-sparkpost-transport');
 
 
 let transporter = nodemailer.createTransport(sparkPostTransport({
-  'sparkPostApiKey': process.env.SPARKPOST_API_KEY
+  'sparkPostApiKey': process.env.SPARKPOST_API_KEY || "stringkiniapikey"
 }))
 
 
@@ -1109,7 +1109,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                     });    
                 }
                 if (vCilj) { //Naloga je vezana
-                    if (req.body.oldCilj && req.body.oldCilj != req.body.sampleCilj) { // Stari in novi cilj nista enaka
+                    if (oldDoc && req.body.oldCilj && req.body.oldCilj != req.body.sampleCilj) { // Stari in novi cilj nista enaka
                         let prevXp = oldDoc.xp;
                         if (req.body.oldStatus == "false") prevXp = 0;
                         Cilji.findOne({ _id: req.body.oldCilj }, function (err, cilj) { //poisci stari cilj
