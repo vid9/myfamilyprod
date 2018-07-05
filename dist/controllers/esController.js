@@ -921,7 +921,7 @@ module.exports.izbrisiNalogo = function (req, res, next) {
                                         cilj.vezani_uporabniki.splice(i,1);
                                     }
                                 }  */
-                                
+                                cilj.xp -= doc.xp;
                             } else {
                                 let obj, curObj;
                                 if (cilj.vezani_uporabniki) obj = cilj.vezani_uporabniki.map(value => String(value.id_user));// uporabniki vezani na cilj
