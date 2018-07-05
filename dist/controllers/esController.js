@@ -214,6 +214,7 @@ module.exports.prijaviUporabnika = function (req, res, next) {
                 uporabnik: "",
                 sporociloPrijava: "Uporabniško ime in geslo se ne ujemata!",
                 currSession: "",
+                email: "",
             });
         }
         else {
@@ -245,7 +246,7 @@ module.exports.prijaviUporabnika = function (req, res, next) {
             if (req.session.trenutniUporabnik) {
                 res.redirect("/");
             } else {
-                res.render("pages/prijava", { sporociloPrijava: "Napačen elektronski naslov ali geslo!", uporabnik: "", currSession: "" });
+                res.render("pages/prijava", { sporociloPrijava: "Napačen elektronski naslov ali geslo!", uporabnik: "", currSession: "", email: email });
             }
         }
     });
@@ -1364,6 +1365,7 @@ function checkIfLogged(res, req) {
             uporabnik: "",
             sporociloPrijava: "",
             currSession: "",
+            email: "",
         });
         return 1;
     }

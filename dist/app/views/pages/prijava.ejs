@@ -13,11 +13,10 @@
                         <form method="POST" action="/prijava" id="prijavaForm" onsubmit="return validatePrijava()">
                             <div class="mdl-card__supporting-text mdl-grid">                          
                                 <input type="hidden" name="action" value="login"/>
-                                <p class="mdl-color-text--red util-center"><%= sporociloPrijava %></h4>
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col <% if (sporociloPrijava) { %>is-invalid<% } %>">
                                     <label class="mdl-textfield__label" for="textfield_email">E-mail</label>
-                                    <input class="mdl-textfield__input" type="email" id="textfield_email" name="email" autocomplete="on" oninput="checkMail(this)"/>
-                                    <span class="mdl-textfield__error" id="emailErr">Vpisani email ni pravilen!</span>
+                                    <input class="mdl-textfield__input" type="email" id="textfield_email" name="email" autocomplete="on" oninput="checkMail(this)" <% if (email) { %> value="<%= email %>" <%  } %> />
+                                    <span class="mdl-textfield__error" id="emailErr"> <% if(sporociloPrijava != "") { %><%= sporociloPrijava %><% } else { %>Vpisani email ni pravilen!<% } %></span>
                                 </div>
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col <% if (sporociloPrijava) { %>is-invalid<% } %>">
                                     <label class="mdl-textfield__label" for="textfield_password">Geslo</label>
