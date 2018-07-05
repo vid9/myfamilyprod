@@ -90,12 +90,13 @@ module.exports.odstraniObvestila = function (req, res) {
 //** POST /api/prijava
 module.exports.posljiToken = function (req, res) {  
   if (req.headers.email && req.headers.password) {
+    console.log(req.headers.email);
     Uporabnik.find({email: req.headers.email}, function (err, uporabniki) {
       if (err) {
         console.log(err);
         res.status(404).send(err);
       } else {
-        if(uporabniki) {
+        if(uporabniki[0]) {
           if (uporabniki[0].email == req.headers.email && bcrypt.compareSync(req.headers.password, uporabniki[0].geslo)) {
             let user = {};
             let token = jwt.sign({ id: uporabniki[0]._id }, config.secret, {    // create a token
