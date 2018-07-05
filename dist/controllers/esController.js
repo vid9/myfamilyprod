@@ -154,7 +154,7 @@ module.exports.naslovnaStran = function (req, res) {
             }
             if (result.cilji[i].skupni_cilj == true) {
                 let usrs = [];
-                for (let c = 0;result.cilji[i].vezani_uporabniki>0;i++) {
+                for (let c = 0;result.cilji[i].vezani_uporabniki.length > c;c++) {
                     if (result.cilji[i].vezani_uporabniki[c].xp_user > 0) {
                         usrs.push(result.cilji[i].vezani_uporabniki[c]);
                     }
