@@ -212,7 +212,7 @@ module.exports.posljiDruzino = function (req, res) {
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
       if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
-      Uporabnik.find({druzina: req.params.druzinaId},{ id: 1, ime: 1, druzina: 1, polozaj: 1, slika: 1}, function (err, uporabniki) {
+      Uporabnik.find({druzina: req.params.druzinaId},{ id: 1, ime: 1, druzina: 1, polozaj: 1, slika: 1, telefon: 1, email: 1}, function (err, uporabniki) {
         if (err) {
           console.log(err);
           res.status(404).send(err);
