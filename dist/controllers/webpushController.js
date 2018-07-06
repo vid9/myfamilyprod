@@ -220,7 +220,7 @@ module.exports.posljiDruzino = function (req, res) {
           let newObj = [];
           let obj = {3 : "Vnuk/Vnukinja", 4 : "Sin/Hči", 5: "Oče/Mati", 6: "Dedek/Babica", 7: "Pradedek/Prababica"};
           for (let i=0;i<uporabniki.length;i++) {
-            newObj.push({_id : uporabniki[i]._id, ime : uporabniki[i].ime, email: obj[uporabniki[i].email], telefon: obj[uporabniki[i].telefon], druzina: uporabniki[i].druzina, polozaj: obj[uporabniki[i].polozaj], slika: uporabniki[i].slika});
+            newObj.push({_id : uporabniki[i]._id, ime : uporabniki[i].ime, email: ouporabniki[i].email, telefon: uporabniki[i].telefon, druzina: uporabniki[i].druzina, polozaj: obj[uporabniki[i].polozaj], slika: uporabniki[i].slika});
           }
           res.status(200).send(newObj);
         }
