@@ -272,7 +272,7 @@ module.exports.ustvariUporabnika = function (req, res, next) {
     Uporabnik.create(noviUporabnik).then(data => {
         res.redirect('/');
     }).catch(err => {
-        vrniNapako(res, err);
+        return res.status(400).end("Uporabnik s tem elektronskim naslovom že obstaja!");
     });
 };
 
@@ -292,7 +292,7 @@ module.exports.posodobiOsebnePodatke = function (req, res, next) {
     Uporabnik.findOneAndUpdate(conditions, updateUporabnik, { upsert: true, runValidators: true }, function (err, doc) { // callback
         if (err) {
             console.log(err);
-            vrniNapako(res, err);
+            return res.status(400).end("Napaka pri posodabljanju!");
         } else {
             req.session.trenutniUporabnik.polozaj = parseInt(req.body.izbranaVrsta);
             req.session.trenutniUporabnik.ime = req.body.set_name;

@@ -114,6 +114,8 @@ module.exports.posljiToken = function (req, res) {
               user.telefon = uporabniki[0].telefon;
               user.slika = uporabniki[0].slika;
               res.status(200).send(user);
+            } else {
+              res.sendStatus(401);
             }
           } catch (error) {
             res.status(404).send(error);
