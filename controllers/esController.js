@@ -272,7 +272,8 @@ module.exports.ustvariUporabnika = function (req, res, next) {
     Uporabnik.create(noviUporabnik).then(data => {
         res.redirect('/');
     }).catch(err => {
-        return res.status(400).end("Uporabnik s tem elektronskim naslovom že obstaja!");
+        console.log(err);
+        return res.status(403).end("Uporabnik s tem elektronskim naslovom že obstaja!");
     });
 };
 
