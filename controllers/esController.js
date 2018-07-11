@@ -293,13 +293,13 @@ module.exports.posodobiOsebnePodatke = function (req, res, next) {
     Uporabnik.findOneAndUpdate(conditions, updateUporabnik, { upsert: true, runValidators: true }, function (err, doc) { // callback
         if (err) {
             console.log(err);
-            return res.status(400).end("Napaka pri posodabljanju!");
+            return res.status(400).send("Napaka! Osebni podatki niso bili posodobljeni.");
         } else {
             req.session.trenutniUporabnik.polozaj = parseInt(req.body.izbranaVrsta);
             req.session.trenutniUporabnik.ime = req.body.set_name;
             req.session.trenutniUporabnik.email = req.body.set_email;
             req.session.trenutniUporabnik.telefon = req.body.set_phone;
-            res.redirect('/')
+            return res.status(200).send("Osebni podatki so bili uspešno posodobljeni!")
         }
     });
 };
