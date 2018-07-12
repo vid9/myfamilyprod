@@ -853,13 +853,13 @@ module.exports.ustvariNalogo = function (req, res, next) {
                                 return res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
                             }
                         });   
-                    }    
-                    Uporabnik.update({ _id: { $in: doc.vezani_uporabniki  } }, { $inc: { dayXp: doc.xp } }, { multi: true }, function (err, docs) {
-                        if (err) {
-                            console.log(err);
-                            return res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
-                        }
-                    });    
+                        Uporabnik.update({ _id: { $in: doc.vezani_uporabniki  } }, { $inc: { dayXp: doc.xp } }, { multi: true }, function (err, docs) {
+                            if (err) {
+                                console.log(err);
+                                return res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
+                            }
+                        });    
+                    }   
                 }
                 if (vCilj) { //Naloga je vezana
                     if (oldDoc && req.body.oldCilj && req.body.oldCilj != req.body.sampleCilj) { // Stari in novi cilj nista enaka
