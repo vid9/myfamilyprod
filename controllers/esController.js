@@ -916,13 +916,13 @@ module.exports.ustvariNalogo = function (req, res, next) {
                             if (cilj.vezani_uporabniki) obj = cilj.vezani_uporabniki.map(value => String(value.id_user));// uporabniki že vezani na cilj
                             else cilj.vezani_uporabniki = [];
                             if(doc.vezani_uporabniki) curObj = doc.vezani_uporabniki.map(value => String(value)); //uporabniki vezani na nalogo
-                            difference = doc.vezani_uporabniki.filter(x => !oldDoc.vezani_uporabniki.includes(x));   
+                            if (oldDoc && doc) difference = doc.vezani_uporabniki.filter(x => !oldDoc.vezani_uporabniki.includes(x));   
                             for (let i = 0; i < curObj.length; i++) {
                                 let index = obj.indexOf(String(curObj[i]));
-                                let tmp = difference.indexOf(String(curObj[i]));
+                                if (oldDoc && doc) let tmp = difference.indexOf(String(curObj[i]));
                                 if (index > -1) { //prištejem točke                         
                                     cilj.vezani_uporabniki[index].xp_user = parseInt(cilj.vezani_uporabniki[index].xp_user) + parseInt(currXp);
-                                    if (tmp > -1 && obj.indexOf(cilj.vezani_uporabniki[index].id_user.toString() > -1)) {cilj.vezani_uporabniki[index].stNal += 1; console.log("zvisujem st nal");}
+                                    if (!oldDoc && tmp > -1 && obj.indexOf(cilj.vezani_uporabniki[index].id_user.toString() > -1)) {cilj.vezani_uporabniki[index].stNal += 1; console.log("zvisujem st nal");}
                                 } else {  //Če uporabnik še ni v cilju, ga dodam                                 
                                     cilj.vezani_uporabniki.push({ "id_user": curObj[i], "xp_user": doc.status ? doc.xp : 0 , "stNal" : 1});
                                     //console.log({ "id_user": curObj[i], "xp_user": doc.status ? doc.xp : 0 });
