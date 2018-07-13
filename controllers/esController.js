@@ -655,7 +655,6 @@ module.exports.izbrisiNalogo = function (req, res, next) {
                                 if (cilj.vezani_uporabniki) obj = cilj.vezani_uporabniki.map(value => String(value.id_user));// uporabniki vezani na cilj
                                 else cilj.vezani_uporabniki = [];
                                 if(doc.vezani_uporabniki) curObj = doc.vezani_uporabniki.map(value => String(value)); //uporabniki vezani na nalogo
-                                console.log(curObj);
                                 for (let i = 0; i < curObj.length; i++) {
                                     let index = obj.indexOf(String(curObj[i]));
                                     if (index > -1) { //prištejem točke                         
@@ -681,17 +680,14 @@ module.exports.izbrisiNalogo = function (req, res, next) {
                                 if (cilj.vezani_uporabniki) obj = cilj.vezani_uporabniki.map(value => String(value.id_user));// uporabniki vezani na cilj
                                 else cilj.vezani_uporabniki = [];
                                 if(doc.vezani_uporabniki) curObj = doc.vezani_uporabniki.map(value => String(value)); //uporabniki vezani na nalogo
-                                console.log(curObj);
                                 for (let i = 0; i < curObj.length; i++) {
                                     let index = obj.indexOf(String(curObj[i]));
                                     if (index > -1) { //prištejem točke                     
                                         cilj.vezani_uporabniki[index].stNal -= 1;
-                                        console.log(cilj.vezani_uporabniki[index].stNal, index);
                                     }                         
                                 }
                                 for (let i = cilj.vezani_uporabniki.length-1; i >= 0; i--) {
                                     let index = doc.vezani_uporabniki.indexOf(cilj.vezani_uporabniki[i].id_user);
-                                    console.log(index, cilj.vezani_uporabniki[i].xp_user, cilj.vezani_uporabniki[i].stNal);
                                     if (cilj.vezani_uporabniki[i].stNal <= 0 && index > -1) {
                                         cilj.vezani_uporabniki.splice(i,1);
                                     }
