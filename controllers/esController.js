@@ -665,7 +665,7 @@ module.exports.izbrisiNalogo = function (req, res, next) {
                                 }
                                 for (let i = cilj.vezani_uporabniki.length-1; i >= 0; i--) {
                                     let index = doc.vezani_uporabniki.indexOf(cilj.vezani_uporabniki[i].id_user);
-                                    if (cilj.vezani_uporabniki[i].xp_user == 0 && cilj.vezani_uporabniki[i].stNal == 0 && index > -1) {
+                                    if (cilj.vezani_uporabniki[i].stNal <= 0 && index > -1) {
                                         cilj.vezani_uporabniki.splice(i,1);
                                     }
                                 }
@@ -692,7 +692,7 @@ module.exports.izbrisiNalogo = function (req, res, next) {
                                 for (let i = cilj.vezani_uporabniki.length-1; i >= 0; i--) {
                                     let index = doc.vezani_uporabniki.indexOf(cilj.vezani_uporabniki[i].id_user);
                                     console.log(index, cilj.vezani_uporabniki[i].xp_user, cilj.vezani_uporabniki[i].stNal);
-                                    if (cilj.vezani_uporabniki[i].xp_user == 0 && cilj.vezani_uporabniki[i].stNal == 0 && index > -1) {
+                                    if (cilj.vezani_uporabniki[i].stNal <= 0 && index > -1) {
                                         cilj.vezani_uporabniki.splice(i,1);
                                     }
                                 }
@@ -944,7 +944,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                                     let index = obj.indexOf(difference[i]);
                                     cilj.vezani_uporabniki[index-deleted].stNal -= 1;
                                     if(sprememba == 0 || sprememba == 3) cilj.vezani_uporabniki[index-deleted].xp_user = parseInt(cilj.vezani_uporabniki[index-deleted].xp_user) - parseInt(doc.xp);
-                                    if (cilj.vezani_uporabniki[index-deleted].stNal == 0) {
+                                    if (cilj.vezani_uporabniki[index-deleted].stNal <= 0) {
                                         cilj.vezani_uporabniki.splice(index-deleted,1);
                                         deleted++;
                                     }
