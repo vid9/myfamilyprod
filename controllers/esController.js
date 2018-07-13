@@ -904,6 +904,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                     //Iščem cilj, pod katerega je bila dodana naloga, uporabnikom prištejem vrednost za naloge, ki so jih naredili
                     Cilji.findOne({ _id: doc.vezan_cilj }, function (err, cilj) {
                         if (!err) {
+                            let difference;
                             currXp = doc.xp;
                             if (req.body.oldCilj != req.body.sampleCilj) {
                                 if (req.body.newStatus == "false") currXp =  0;
@@ -916,30 +917,40 @@ module.exports.ustvariNalogo = function (req, res, next) {
                             if (cilj.vezani_uporabniki) obj = cilj.vezani_uporabniki.map(value => String(value.id_user));// uporabniki že vezani na cilj
                             else cilj.vezani_uporabniki = [];
                             if(doc.vezani_uporabniki) curObj = doc.vezani_uporabniki.map(value => String(value)); //uporabniki vezani na nalogo
-                            if (oldDoc && doc) difference = doc.vezani_uporabniki.filter(x => !oldDoc.vezani_uporabniki.includes(x));   
+                            let tmparr;
+                            if (oldDoc && doc) {
+                                tmparr = oldDoc.vezani_uporabniki.map(value => String(value));
+                                difference = curObj.filter(x => !tmparr.includes(x));   
+                            }
                             for (let i = 0; i < curObj.length; i++) {
                                 let index = obj.indexOf(String(curObj[i]));
-                                let tmp = -1;
-                                if (oldDoc && doc) tmp = difference.indexOf(String(curObj[i]));
+                                let tmp = -2;
+                                if (oldDoc && doc) {
+                                    tmp = difference.indexOf(String(curObj[i]));
+                                }                                
                                 if (index > -1) { //prištejem točke                         
                                     cilj.vezani_uporabniki[index].xp_user = parseInt(cilj.vezani_uporabniki[index].xp_user) + parseInt(currXp);
-                                    if (!oldDoc && tmp > -1 && obj.indexOf(cilj.vezani_uporabniki[index].id_user.toString() > -1)) {cilj.vezani_uporabniki[index].stNal += 1; console.log("zvisujem st nal");}
+                                    if (tmp > -1 && obj.indexOf(cilj.vezani_uporabniki[index].id_user.toString() > -1)) {cilj.vezani_uporabniki[index].stNal += 1; console.log("zvisujem st nal");}
                                 } else {  //Če uporabnik še ni v cilju, ga dodam                                 
                                     cilj.vezani_uporabniki.push({ "id_user": curObj[i], "xp_user": doc.status ? doc.xp : 0 , "stNal" : 1});
                                     //console.log({ "id_user": curObj[i], "xp_user": doc.status ? doc.xp : 0 });
                                 }                          
                             }
-                            difference = obj.filter(x => !curObj.includes(x));                        
-                            //if (req.body.oldStatus) { //Uporabnikom, ki niso več pod nalogo odšetejem točke
-                            let deleted=0;
-                            for(let i=0;i<difference.length-deleted;i++) {
-                                let index = obj.indexOf(difference[i-deleted]);
-                                if(sprememba == 0 || sprememba == 3) cilj.vezani_uporabniki[index-deleted].xp_user = parseInt(cilj.vezani_uporabniki[index-deleted].xp_user) - parseInt(doc.xp);
-                                if (cilj.vezani_uporabniki[index-deleted].stNal == 0) {
-                                    cilj.vezani_uporabniki.splice(index-deleted,1);
-                                    deleted++;
-                                }
+                            difference = [];                           
+                            if (oldDoc && doc) {  
+                                let deleted = 0;                              
+                                difference = tmparr.filter(x => !curObj.includes(x)); 
+                                for(let i=difference.length-1;i>=0;i--) {
+                                    let index = obj.indexOf(difference[i]);
+                                    cilj.vezani_uporabniki[index-deleted].stNal -= 1;
+                                    if(sprememba == 0 || sprememba == 3) cilj.vezani_uporabniki[index-deleted].xp_user = parseInt(cilj.vezani_uporabniki[index-deleted].xp_user) - parseInt(doc.xp);
+                                    if (cilj.vezani_uporabniki[index-deleted].stNal == 0) {
+                                        cilj.vezani_uporabniki.splice(index-deleted,1);
+                                        deleted++;
+                                    }
+                                } 
                             }
+                            //if (req.body.oldStatus) { //Uporabnikom, ki niso več pod nalogo odšetejem točke //TODO POPRAVI TA DEL!!!!                           
                             if (req.body.oldCilj == req.body.sampleCilj) {cilj.xp = parseInt(cilj.xp) + parseInt(currXp);}
                             else if (doc.status) {
                                 cilj.xp = parseInt(cilj.xp) + parseInt(doc.xp);
