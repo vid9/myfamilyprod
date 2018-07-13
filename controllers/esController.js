@@ -820,7 +820,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                         }
                     });         
                 }     
-                if (sprememba == 1) { //dodam xp vsem trenutnim članom naloge
+                if (sprememba == 1) { //dodam xp vsem trenutnim članom naloge 1 = false->true;
                     console.log("spr 1");
                     let updt, upXp;
                     //console.log(oldDoc, "oldDoc");
@@ -832,7 +832,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                             return res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
                         }
                     });
-                } else if (sprememba == 0) {    //izbrišem xp starim članom naloge
+                } else if (sprememba == 0) {    //izbrišem xp starim članom naloge // 0 = true->false;
                     console.log("spr 0");
                     Uporabnik.update({ _id: { $in: oldDoc.vezani_uporabniki } }, { $inc: { dayXp: -oldDoc.xp } }, { multi: true }, function (err, docs) {
                         if (err) {
@@ -840,9 +840,9 @@ module.exports.ustvariNalogo = function (req, res, next) {
                             return res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
                         }
                     });                
-                } else if (sprememba == 3) { //dodam xp novim članom in odštejem ali dodam starim
+                } else if (sprememba == 3) { //dodam xp novim članom in odštejem ali dodam starim 3 = true->true
                     console.log("spr 3");
-                    if (doc.xp != oldDoc.xp) {
+                    if (oldDoc) {
                         Uporabnik.update({ _id: { $in: oldDoc.vezani_uporabniki } }, { $inc: { dayXp: -oldDoc.xp } }, { multi: true }, function (err, docs) {
                             if (err) {
                                 console.log(err);
@@ -855,7 +855,7 @@ module.exports.ustvariNalogo = function (req, res, next) {
                                 return res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
                             }
                         });    
-                    }   
+                    }
                 }
                 if (vCilj) { //Naloga je vezana
                     if (oldDoc && req.body.oldCilj && req.body.oldCilj != req.body.sampleCilj) { // Stari in novi cilj nista enaka
