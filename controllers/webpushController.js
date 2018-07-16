@@ -330,6 +330,7 @@ module.exports.changePassword = function (req,res) {
   if (req.query.token) {
     jwt.verify(req.query.token, config.secret, function(err, decoded) {
       if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
+      console.log(decoded.email, "email is not working", decoded);
       res.render("pages/prijava", {isLoggedIn: false,
         uporabniki: 0,
         uporabnik: "",
@@ -381,13 +382,13 @@ module.exports.confirmPassword = function (req,res) {
 
 /** POST /api/reset_password/ */
 module.exports.resetPassword = function (req,res) {
-  Uporabnik.find({email: req.body.email}, function (err, uporabniki) {
+  Uporabnik.findOne({email: req.body.email}, function (err, uporabniki) {
     if (err) {
       console.log(err);
       res.status(404).send("Uporabnik s tem e-mail naslovom ne obstaja!");
     } else {
-      if(uporabniki[0]) {
-        let token = jwt.sign({ email: uporabniki[0].email }, config.secret, {    // create a token
+      if(uporabniki) {
+        let token = jwt.sign({ email: req.body.email }, config.secret, {    // create a token
           expiresIn: 3600 // expires in 1 hour
         });
         let vsebina = '<p>Nekdo (predvidoma vi) je zahteval ponastavitev gesla za uporabniški račun '+req.body.email+' v aplikaciji MyFamily. Do sedaj v računu ni bilo sprememb.'+
