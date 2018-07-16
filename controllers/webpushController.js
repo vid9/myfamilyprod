@@ -326,6 +326,7 @@ module.exports.prejmiNalogo = function (req, res) {
 
 /** GET /api/change/ */
 module.exports.changePassword = function (req,res) {
+  console.log(req.query, req.query.token);
   if (req.query.token) {
     jwt.verify(token, config.secret, function(err, decoded) {
       if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
@@ -381,7 +382,7 @@ module.exports.resetPassword = function (req,res) {
         '<br/><br/>'+
         'Če želite ponastaviti geslo, kliknite na spodnjo povezavo in sledite navodilom na strani.'+
         '<br/>'+
-        '<a href="https://ekosmartweb.herokuapp.com/change?token='+token+'">Ponastavi geslo</a>'+
+        '<a href="https://ekosmartweb.herokuapp.com/api/change?token='+token+'">Ponastavi geslo</a>'+
         '<br/><br/>'+
         'Če niste vi zahtevali novega gesla, oziroma ga ne želite spremeniti, potem to sporočilo ignorirajte. Povezava bo po 1 uri deaktivirana.'+
         '<br/><br/>'+
@@ -392,7 +393,7 @@ module.exports.resetPassword = function (req,res) {
             from: 'MyFamily@'+process.env.SPARKPOST_DOMAIN,
             to: req.body.email,
             subject: "Zahteva za ponastavitev gesla",
-            text: vsebina,
+            html: vsebina,
         }
         console.log("Sending mail", mailOptions);
         transporter.sendMail(mailOptions, function (error, info) {
