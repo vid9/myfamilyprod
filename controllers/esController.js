@@ -246,7 +246,7 @@ module.exports.prijaviUporabnika = function (req, res, next) {
             if (req.session.trenutniUporabnik) {
                 res.redirect("/");
             } else {
-                res.render("pages/prijava", { sporociloPrijava: "Napačen elektronski naslov ali geslo!", uporabnik: "", currSession: "", email: email });
+                res.render("pages/prijava", { sporociloPrijava: "Napačen elektronski naslov ali geslo!", uporabnik: "", currSession: "", email: email, changePass : false });
             }
         }
     });
@@ -1114,6 +1114,7 @@ function checkIfLogged(res, req) {
             sporociloPrijava: "",
             currSession: "",
             email: "",
+            changePass: false,
         });
         return 1;
     }
