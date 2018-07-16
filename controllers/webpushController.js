@@ -346,16 +346,28 @@ module.exports.changePassword = function (req,res) {
 
 /** POST /api/confirm/ */
 module.exports.confirmPassword = function (req,res) {
-  if (req.query.token) {
+  if (req.query.token && req.body.password) {
     jwt.verify(req.query.token, config.secret, function(err, decoded) {
       if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
+      console.log(decoded.email);
       Uporabnik.findOne({email: decoded.email}, function (err, uporabnik) {
         if (err) {
           console.log(err);
           res.status(404).send("Uporabnik s tem e-mail naslovom ne obstaja!");
         } else {
+          console.log(req.body.password);
+          console.log(uporabnik);
+          console.log(uporabni.geslo)
           uporabnik.geslo = bcrypt.hashSync(req.body.password, 8);
-          uporabnik.save;
+          uporabnik.save(function (err) {
+            if (!err) {
+                return res.status(200).end("Geslo je bilo uspešno posodobljeno!");
+            }
+            else {
+                console.log(err);
+                return res.status(400).end("Pri posodabljanju gesla je prišlo do napake!");
+            }
+        });
           res.status(200).send("Geslo je bilo uspešno posodobljeno!"); 
         }
       });
