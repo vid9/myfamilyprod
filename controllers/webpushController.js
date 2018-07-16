@@ -357,7 +357,7 @@ module.exports.confirmPassword = function (req,res) {
         } else {
           console.log(req.body.password);
           console.log(uporabnik);
-          console.log(uporabni.geslo)
+          console.log(uporabnik.geslo)
           uporabnik.geslo = bcrypt.hashSync(req.body.password, 8);
           uporabnik.save(function (err) {
             if (!err) {
@@ -387,7 +387,7 @@ module.exports.resetPassword = function (req,res) {
       res.status(404).send("Uporabnik s tem e-mail naslovom ne obstaja!");
     } else {
       if(uporabniki[0]) {
-        let token = jwt.sign({ id: uporabniki[0].email }, config.secret, {    // create a token
+        let token = jwt.sign({ email: uporabniki[0].email }, config.secret, {    // create a token
           expiresIn: 3600 // expires in 1 hour
         });
         let vsebina = '<p>Nekdo (predvidoma vi) je zahteval ponastavitev gesla za uporabniški račun '+req.body.email+' v aplikaciji MyFamily. Do sedaj v računu ni bilo sprememb.'+
