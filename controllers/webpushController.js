@@ -354,7 +354,7 @@ module.exports.confirmPassword = function (req,res) {
           console.log(err);
           res.status(404).send("Uporabnik s tem e-mail naslovom ne obstaja!");
         } else {
-          uporabnik.geslo = bcrypt.hashSync(req.body.reg_password, 8);
+          uporabnik.geslo = bcrypt.hashSync(req.body.password, 8);
           uporabnik.save;
           res.status(200).send("Geslo je bilo uspešno posodobljeno!"); 
         }
