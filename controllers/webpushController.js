@@ -324,19 +324,18 @@ module.exports.prejmiNalogo = function (req, res) {
   }  
 };
 
-/** POST /api/change/ */
+/** GET /api/change/ */
 module.exports.changePassword = function (req,res) {
   if (req.query.token) {
     jwt.verify(token, config.secret, function(err, decoded) {
       if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
-      Uporabnik.findOne({email: req.body.email}, function (err, uporabniki) {
-        if (err) {
-          console.log(err);
-          res.status(404).send("Uporabnik s tem e-mail naslovom ne obstaja!");
-        } else {
-          //prikazem polja za spremenit password
-
-        }
+      res.render("pages/prijava", {isLoggedIn: false,
+        uporabniki: 0,
+        uporabnik: "",
+        sporociloPrijava: "",
+        currSession: "",
+        email: "",
+        changePass: true,
       });
     });  
   } else {
@@ -355,6 +354,8 @@ module.exports.confirmPassword = function (req,res) {
           res.status(404).send("Uporabnik s tem e-mail naslovom ne obstaja!");
         } else {
           uporabnik.geslo = bcrypt.hashSync(req.body.reg_password, 8);
+          uporabnik.save;
+          res.status(200).send("Geslo je bilo uspešno posodobljeno!"); 
         }
       });
     });  
@@ -399,6 +400,7 @@ module.exports.resetPassword = function (req,res) {
                 console.log('Email sent: ' + info.response);
             }
         });
+        res.status(200).send("Zahtevek za ponastavitev gesla je bil poslan na vaš naslov!")
       } else {
         res.status(404).send(err);
       }
