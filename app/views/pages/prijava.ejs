@@ -31,8 +31,8 @@
                                     </button>
                                 </div>
                                 <div class="mdl-cell mdl-cell--12-col mdl-typography--body-1" align="center">  
-                                    Še nimate svojega računa?                                     
-                                    <a href="javascript:void(0);" onclick="prikaziRegistracija()">Registrirajte se »</a>
+                                Še nimate svojega računa? <a href="javascript:void(0);" onclick="prikaziRegistracija()">Registrirajte se »</a>
+                                <br/>Ste pozabili geslo? <a href="javascript:void(0);" onclick="prikaziPass()">Pozabljeno geslo »</a>    
                                 </div>
                             </div>
                         </form>
@@ -89,16 +89,6 @@
                                 </label>
                                 <% } %>
                             </div>
-                            <!--
-                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-textfield--file mdl-cell mdl-cell--12-col">
-                                <label class="mdl-textfield__label" for="reg_slika_ime">Prikazna slika</label>
-                                <input class="mdl-textfield__input" type="text" id="reg_slika_ime" readonly />
-                                <div class="mdl-button mdl-button--icon mdl-button--file">
-                                    <i class="material-icons">attach_file</i>
-                                    <input type="file" accept="image/*" name="reg_slika" id="reg_slika" onchange="updatePic(this)" />
-                                </div>
-                                <span class="mdl-textfield__error" id="errSlika">Datoteka ni v pravilnem formatu!</span>
-                            </div>-->
                         </div>
                         <div class="mdl-card__actions mdl-card--border" align="center">
                             <div class="mdl-cell mdl-cell--12-col send-button" align="center">
@@ -107,16 +97,74 @@
                                 </button>
                             </div>
                             <div class="mdl-cell mdl-cell--12-col mdl-typography--body-1" align="center">
-                                Že imate svoj račun?    
-                                <a href="javascript:void(0);" onclick="prikaziPrijava()">Prijava »</a>
+                            Že imate svoj račun? <a href="javascript:void(0);" onclick="prikaziPrijava()">Prijava »</a>
+                            <br/>Ste pozabili geslo? <a href="javascript:void(0);" onclick="prikaziPass()">Pozabljeno geslo »</a>
                             </div>
                         </div>
                     </form>
                     </div>
+                    <div class="mdl-card mdl-shadow--16dp util-center" id="lostPass" style="display: none;">
+                        <div class="mdl-card__title color-orange krivulja-2 header2">
+                            <h2 class="mdl-card__title-text mdl-color-text--white shadow-text">Pozabljeno geslo</h2>
+                        </div>
+                        <form method="POST" action="/api/reset_password" id="passForm" onsubmit="return validatePassword()">
+                            <div class="mdl-card__supporting-text mdl-grid"> 
+                                    <p class="mdl-typography--subtitle">V spodnje okno vpišite vaš E-poštni naslov, na katerega vam bomo poslali zahtevek za ponastavitev gesla.</p>                         
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col">
+                                    <label class="mdl-textfield__label" for="textfield_email">E-mail</label>
+                                    <input class="mdl-textfield__input" type="email" id="email_password" name="email" autocomplete="on" oninput="checkMail(this)"/>
+                                    <span class="mdl-textfield__error" id="emailResetErr">Prosimo vpišite vaš E-poštni naslov!</span>
+                                </div>                          
+                            </div>
+                            <div class="mdl-card__actions mdl-card--border" align="center">
+                                <div class="mdl-cell mdl-cell--12-col send-button" align="center">
+                                    <button type="submit" class="mdl-button mdl-js-ripple-effect mdl-js-button mdl-button--raised color-blue mdl-color-text--white">
+                                        Pošlji
+                                    </button>
+                                </div>
+                                <div class="mdl-cell mdl-cell--12-col mdl-typography--body-1" align="center">  
+                                Še nimate svojega računa? <a href="javascript:void(0);" onclick="prikaziRegistracija()">Registrirajte se »</a>
+                                <br/>Že imate svoj račun? <a href="javascript:void(0);" onclick="prikaziPrijava()">Prijava »</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="mdl-card mdl-shadow--16dp util-center" id="changePass" style="display: none;">
+                            <div class="mdl-card__title color-orange krivulja-2 header2">
+                                <h2 class="mdl-card__title-text mdl-color-text--white shadow-text">Pozabljeno geslo</h2>
+                            </div>
+                            <form method="POST" id="changeForm" onsubmit="return validateChange()">
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col">
+                                        <label class="mdl-textfield__label" for="password">Geslo*</label>
+                                        <input class="mdl-textfield__input" type="password" name="password" pattern=".{6,}"/>
+                                        <span class="mdl-textfield__error" id="errChange">Geslo mora vsebovati vsaj 6 znakov!</span>
+                                    </div>
+                                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label mdl-cell mdl-cell--12-col">
+                                        <label class="mdl-textfield__label" for="password_confirm">Potrditev gesla*</label>
+                                        <input class="mdl-textfield__input" type="password" name="password_confirm"/>
+                                        <span class="mdl-textfield__error" id="errChange2">Gesli se ne ujemata!</span>
+                                    </div>
+                                <div class="mdl-card__actions mdl-card--border" align="center">
+                                    <div class="mdl-cell mdl-cell--12-col send-button" align="center">
+                                        <button type="submit" class="mdl-button mdl-js-ripple-effect mdl-js-button mdl-button--raised color-blue mdl-color-text--white">
+                                            Pošlji
+                                        </button>
+                                    </div>
+                                    <div class="mdl-cell mdl-cell--12-col mdl-typography--body-1" align="center">  
+                                    Še nimate svojega računa? <a href="javascript:void(0);" onclick="prikaziRegistracija()">Registrirajte se »</a>
+                                    <br/>Že imate svoj račun? <a href="javascript:void(0);" onclick="prikaziPrijava()">Prijava »</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                 </div>
                 <%- include('../partials/footer') -%>
             </main>
         </div>
+        <div id="mainToast" class="mdl-js-snackbar mdl-snackbar">
+                <div class="mdl-snackbar__text"></div>
+                <button class="mdl-snackbar__action" type="button"></button>
+            </div>
         <%- include('../partials/scriptp') -%>
         <script src="/public/js/prijava.js"></script>
     </body>

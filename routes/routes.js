@@ -54,7 +54,11 @@ router.get('/api/kategorije/', subscriptionHandler.posljiKategorije);
 
 router.get('/api/druzina/:druzinaId', subscriptionHandler.posljiDruzino);
 
+router.post('/api/reset_password/', subscriptionHandler.resetPassword);
 
+router.post('/api/confirm/', subscriptionHandler.confirmPassword);
+
+router.get('/api/change/', subscriptionHandler.changePassword)
 
 //router.post('/api/trigger-push-msg', subscriptionHandler.posljiObvestila);
 
