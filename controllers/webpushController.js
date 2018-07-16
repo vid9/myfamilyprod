@@ -328,7 +328,7 @@ module.exports.prejmiNalogo = function (req, res) {
 module.exports.changePassword = function (req,res) {
   console.log(req.query, req.query.token);
   if (req.query.token) {
-    jwt.verify(token, config.secret, function(err, decoded) {
+    jwt.verify(req.query.token, config.secret, function(err, decoded) {
       if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
       res.render("pages/prijava", {isLoggedIn: false,
         uporabniki: 0,
@@ -346,8 +346,8 @@ module.exports.changePassword = function (req,res) {
 
 /** POST /api/confirm/ */
 module.exports.confirmPassword = function (req,res) {
-  if (req.params.token) {
-    jwt.verify(token, config.secret, function(err, decoded) {
+  if (req.query.token) {
+    jwt.verify(req.query.token, config.secret, function(err, decoded) {
       if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
       Uporabnik.findOne({email: decoded.email}, function (err, uporabnik) {
         if (err) {
