@@ -326,11 +326,9 @@ module.exports.prejmiNalogo = function (req, res) {
 
 /** GET /api/change/ */
 module.exports.changePassword = function (req,res) {
-  console.log(req.query, req.query.token);
   if (req.query.token) {
     jwt.verify(req.query.token, config.secret, function(err, decoded) {
       if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
-      console.log(decoded.email, "email is not working", decoded);
       res.render("pages/prijava", {isLoggedIn: false,
         uporabniki: 0,
         uporabnik: "",
@@ -350,15 +348,11 @@ module.exports.confirmPassword = function (req,res) {
   if (req.query.token && req.body.password) {
     jwt.verify(req.query.token, config.secret, function(err, decoded) {
       if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
-      console.log(decoded.email);
       Uporabnik.findOne({email: decoded.email}, function (err, uporabnik) {
         if (err) {
           console.log(err);
           res.status(404).send("Uporabnik s tem e-mail naslovom ne obstaja!");
         } else {
-          console.log(req.body.password);
-          console.log(uporabnik);
-          console.log(uporabnik.geslo)
           uporabnik.geslo = bcrypt.hashSync(req.body.password, 8);
           uporabnik.save(function (err) {
             if (!err) {
