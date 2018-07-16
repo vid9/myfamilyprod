@@ -377,15 +377,17 @@ module.exports.resetPassword = function (req,res) {
         let token = jwt.sign({ id: uporabniki[0].email }, config.secret, {    // create a token
           expiresIn: 3600 // expires in 1 hour
         });
-        let vsebina = '<p>Nekdo (predvidoma vi) je zahteval ponastavitev gesla za uporabni&scaron;ki račun '+req.body.email+' v aplikaciji MyFamily. Do sedaj v računu ni bilo sprememb.</p>'+
-        '<p>&nbsp;</p>'+
-        '<p>Če želite ponastaviti geslo, kliknite na spodnjo povezavo in sledite navodilom na strani.</p>'+
-        '<a href="https://ekosmartweb.herokuapp.com/change/'+token+'">Ponastavi geslo</a>'
-        '<p>&nbsp;</p>'+
-        '<p>Če niste vi zahtevali novega gesla, oziroma ga ne želite spremeniti, potem to sporočilo ignorirajte. Povezava bo po 1 uri deaktivirana.</p>'+
-        '<p>&nbsp;</p>'+
-        '<p>Lep pozdrav,</p>'+
-        '<p>Ekipa MyFamily</p>';             
+        let vsebina = '<p>Nekdo (predvidoma vi) je zahteval ponastavitev gesla za uporabniški račun '+req.body.email+' v aplikaciji MyFamily. Do sedaj v računu ni bilo sprememb.'+
+        '<br/><br/>'+
+        'Če želite ponastaviti geslo, kliknite na spodnjo povezavo in sledite navodilom na strani.'+
+        '<br/>'+
+        '<a href="https://ekosmartweb.herokuapp.com/change?token='+token+'">Ponastavi geslo</a>'+
+        '<br/><br/>'+
+        'Če niste vi zahtevali novega gesla, oziroma ga ne želite spremeniti, potem to sporočilo ignorirajte. Povezava bo po 1 uri deaktivirana.'+
+        '<br/><br/>'+
+        'Lep pozdrav,'+
+        '<br/>'+
+        'Ekipa MyFamily</p>';    
         mailOptions = {
             from: 'MyFamily@'+process.env.SPARKPOST_DOMAIN,
             to: req.body.email,
