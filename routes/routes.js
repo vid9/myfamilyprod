@@ -58,7 +58,9 @@ router.post('/api/reset_password/', subscriptionHandler.resetPassword);
 
 router.post('/api/confirm/', subscriptionHandler.confirmPassword);
 
-router.get('/api/change/', subscriptionHandler.changePassword)
+router.get('/api/change/', subscriptionHandler.changePassword);
+
+router.get('/api/send_mail/', subscriptionHandler.posljiMail);
 
 //router.post('/api/trigger-push-msg', subscriptionHandler.posljiObvestila);
 
