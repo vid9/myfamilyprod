@@ -39,6 +39,7 @@ function sendSMS() {
                 if (err) {
                     return res.status(404).end();
                 }
+                let idx = {};
                 if (naloga.length == 0) {
                 } else {
                     for (let i = 0; i < naloga.length; i++) {
