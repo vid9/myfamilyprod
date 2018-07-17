@@ -253,7 +253,7 @@ module.exports.prejmiNalogo = function (req, res) {
     Naloge.findOneAndUpdate(conditions, novaNaloga, { upsert: true,new: true, runVlidators: true}, function (err, doc) { // callback
       if (err) {
           console.log(err);
-          return res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
+          return res.status(400).send("Pri shranjevanju naloge je prišlo do napake!");
       } else {   
         let updt, upXp;
         if (doc) {
@@ -264,7 +264,7 @@ module.exports.prejmiNalogo = function (req, res) {
           Uporabnik.update({ _id: { $in: updt } }, { $inc: { dayXp: upXp } }, { multi: true }, function (err, docs) {
               if (err) {
                   console.log(err);
-                  return res.status(400).end("Pri shranjevanju točk je prišlo do napake!");
+                  return res.status(400).send("Pri shranjevanju točk je prišlo do napake!");
               }
           });
         }
@@ -296,31 +296,31 @@ module.exports.prejmiNalogo = function (req, res) {
               cilj.save(function (err) {
                 if (!err) {
                     if (doc) {
-                      return res.status(200).end("Naloga je bila uspešno posodobljena!");
+                      return res.status(200).send("Naloga je bila uspešno posodobljena!");
                     } else {
-                      return res.status(200).end("Naloga je bila uspešno ustvarjena!");
+                      return res.status(200).send("Naloga je bila uspešno ustvarjena!");
                     }
                 }
                 else {
                   console.log(err);
-                  return res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
+                  return res.status(400).send("Pri shranjevanju naloge je prišlo do napake!");
                 }
               });
             } else {
                 console.log(err);
-                return res.status(400).end("Pri shranjevanju naloge je prišlo do napake!");
+                return res.status(400).send("Pri shranjevanju naloge je prišlo do napake!");
             }
           });
         }
         if (doc) {
-          return res.status(200).end("Naloga je bila uspešno posodobljena!");
+          return res.status(200).send("Naloga je bila uspešno posodobljena!");
         } else {
-          return res.status(200).end("Naloga je bila uspešno ustvarjena!");
+          return res.status(200).send("Naloga je bila uspešno ustvarjena!");
         }      
       });
     });
   } else {
-    res.status(401).send({ auth: false, message: 'No token provided.' });  
+    res.status(401).send('No token provided.');  
   }  
 };
 
@@ -339,7 +339,7 @@ module.exports.changePassword = function (req,res) {
       });
     });  
   } else {
-    res.status(401).send({ auth: false, message: 'No token provided.' });  
+    res.status(401).send('No token provided.' );  
   }    
 }
 
@@ -356,11 +356,11 @@ module.exports.confirmPassword = function (req,res) {
           uporabnik.geslo = bcrypt.hashSync(req.body.password, 8);
           uporabnik.save(function (err) {
             if (!err) {
-                return res.status(200).end("Geslo je bilo uspešno posodobljeno!");
+                return res.status(200).send("Geslo je bilo uspešno posodobljeno!");
             }
             else {
                 console.log(err);
-                return res.status(400).end("Pri posodabljanju gesla je prišlo do napake!");
+                return res.status(400).send("Pri posodabljanju gesla je prišlo do napake!");
             }
         });
           res.status(200).send("Geslo je bilo uspešno posodobljeno!"); 
@@ -368,7 +368,7 @@ module.exports.confirmPassword = function (req,res) {
       });
     });  
   } else {
-    res.status(401).send({ auth: false, message: 'No token provided.' });  
+    res.status(401).send('No token provided.' );  
   }    
 }
 
@@ -387,7 +387,7 @@ module.exports.resetPassword = function (req,res) {
         });
         let vsebina = '<p>Nekdo (predvidoma vi) je zahteval ponastavitev gesla za uporabniški račun '+req.body.email+' v aplikaciji MyFamily. Do sedaj v računu ni bilo sprememb.'+
         '<br/><br/>'+
-        'Če želite ponastaviti geslo, kliknite na spodnjo povezavo in sledite navodilom na strani.'+
+        'Če želite ponastaviti geslo, kliknite na spodnjo povezavo in si izberite novo geslo.'+
         '<br/>'+
         '<a href="https://ekosmartweb.herokuapp.com/api/change?token='+token+'">Ponastavi geslo</a>'+
         '<br/><br/>'+
@@ -402,7 +402,6 @@ module.exports.resetPassword = function (req,res) {
             subject: "Zahteva za ponastavitev gesla",
             html: vsebina,
         }
-        console.log("Sending mail", mailOptions);
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
