@@ -421,18 +421,15 @@ module.exports.resetPassword = function (req,res) {
 
 /** GET /api/send_mail/ */
 module.exports.posljiMail = function (req,res) {
-  console.log("Sending daily notifications!")
   Uporabnik.find({ notf_email: true }, function (err, emailusers) {
       if (err) {
           console.log(error);
           return;
       }
-      console.log(emailusers);
       for(let j = 0; j < emailusers.length; j++) {
-          console.log("sending to user"+emailusers[j].email);
           Naloge.find({ vezani_uporabniki: emailusers[j]._id }, function (err, naloga) {
               if (err) {
-                  throw err;
+                res.status(404).end();
               }
               let idx = {};
               if (naloga.length == 0) {
@@ -447,27 +444,28 @@ module.exports.posljiMail = function (req,res) {
                       }
                   }
                   let length = (Object.values(idx).length > 5) ? 5 : Object.values(idx).length;
-                  if (Object.values(idx)) {      
-                      console.log("User has tasks to do");                        
-                      let vsebina = 'Opomniki za nedokončane naloge:\n\n';
-                      for (let i=0; i<length; i++) {
-                          vsebina += "Ime: "+Object.values(idx)[i].ime+"\nOpis: "+Object.values(idx)[i].opis+"\nZačetek: "+moment(Object.values(idx)[i].zacetek).format("D. M ob H:m")+
-                          "\nKonec: "+moment(Object.values(idx)[i].konec).format("D. M ob H:m")+"\nTočk: "+Object.values(idx)[i].xp+"\n\n";
+                  if (Object.values(idx)) {                              
+                    let vsebina = 'Opomniki za nedokončane naloge:\n\n';
+                    for (let i=0; i<length; i++) {
+                        vsebina += "Ime: "+Object.values(idx)[i].ime+"\nOpis: "+Object.values(idx)[i].opis+"\nZačetek: "+moment(Object.values(idx)[i].zacetek).format("D. M ob HH:mm")+
+                        "\nKonec: "+moment(Object.values(idx)[i].konec).format("D. M ob HH:mm")+"\nTočk: "+Object.values(idx)[i].xp+"\n\n";
+                    }
+                    mailOptions = {
+                        from: 'MyFamily@'+process.env.SPARKPOST_DOMAIN,
+                        to: emailusers[j].email,
+                        subject: "Opomnik " + moment(new Date()).format('M. D'),
+                        text: vsebina,
+                    }
+                    console.log("Sending mail to user", mailOptions);
+                    transporter.sendMail(mailOptions, function (error, info) {
+                      if (error) {
+                          console.log(error);
+                          res.status(404).end();
+                      } else {
+                          console.log('Email sent: ' + info.response);
+                          res.status(200).end();
                       }
-                      mailOptions = {
-                          from: 'MyFamily@'+process.env.SPARKPOST_DOMAIN,
-                          to: emailusers[j].email,
-                          subject: "Opomnik " + moment(new Date()).format('M. D'),
-                          text: vsebina,
-                      }
-                      console.log("Sending mail to user", mailOptions);
-                      transporter.sendMail(mailOptions, function (error, info) {
-                          if (error) {
-                              console.log(error);
-                          } else {
-                              console.log('Email sent: ' + info.response);
-                          }
-                      });
+                    });
                   }
               }
           });
