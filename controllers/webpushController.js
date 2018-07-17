@@ -379,7 +379,7 @@ module.exports.resetPassword = function (req,res) {
   Uporabnik.findOne({email: req.body.email}, function (err, uporabniki) {
     if (err) {
       console.log(err);
-      res.status(404).send("Uporabnik s tem e-mail naslovom ne obstaja!");
+      res.status(404).send(err);
     } else {
       if(uporabniki) {
         let token = jwt.sign({ email: req.body.email }, config.secret, {    // create a token
@@ -411,7 +411,7 @@ module.exports.resetPassword = function (req,res) {
         });
         res.status(200).send("Zahtevek za ponastavitev gesla je bil poslan na vaš naslov!")
       } else {
-        res.status(404).send(err);
+        res.status(404).send("Uporabnik s tem e-mail naslovom ne obstaja!");
       }
     }
   });
