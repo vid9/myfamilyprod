@@ -4,6 +4,7 @@ require( '../models/db' );
 
 var mongoose = require( 'mongoose' );
 let Uporabnik = mongoose.model("Uporabnik");
+let Naloge = mongoose.model("Naloge");
 let moment = require('moment');
 let latinize = require('latinize');
 let SMSAPI = require('smsapicom'),smsapi = new SMSAPI({
@@ -38,7 +39,6 @@ function sendSMS() {
                 if (err) {
                     return res.status(404).end();
                 }
-                let temp = [];
                 if (naloga.length == 0) {
                 } else {
                     for (let i = 0; i < naloga.length; i++) {
