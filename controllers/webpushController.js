@@ -427,6 +427,7 @@ module.exports.posljiMail = function (req,res) {
           console.log(error);
           return;
       }
+      console.log(emailusers);
       for(let j = 0; j < emailusers.length; j++) {
           console.log("sending to user"+emailusers[j].email);
           Naloge.find({ vezani_uporabniki: emailusers[j]._id }, function (err, naloga) {

@@ -64,5 +64,4 @@ router.get('/api/send_mail/', subscriptionHandler.posljiMail);
 
 //router.post('/api/trigger-push-msg', subscriptionHandler.posljiObvestila);
 
-
 module.exports = router;
