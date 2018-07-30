@@ -56,7 +56,7 @@ function sendSMS() {
                             vsebina += "Ime: "+Object.values(idx)[i].ime+"\nOpis: "+Object.values(idx)[i].opis+"\nZačetek: "+moment(Object.values(idx)[i].zacetek).format("D. M ob HH:mm")+
                             "\nKonec: "+moment(Object.values(idx)[i].konec).format("D. M ob HH:mm")+"\nTočk: "+Object.values(idx)[i].xp+"\n\n";
                         }
-                        sendMessage(smsusers[j].telefon, latinize(vsebina))
+                        sendMessage("MyFamily", "386"+parseInt(smsusers[j].telefon), latinize(vsebina))
                         .then(displayResult)
                         .catch(displayError);
                     }                    
@@ -117,10 +117,10 @@ function sendMail() {
     });
 }
 
-function sendMessage(number, text){
+function sendMessage(name, number, text) {
     return smsapi.message
         .sms()
-        .from('MyFamilyApp')
+        .from(name)
         .to(number)
         .message(text)
         .execute(); // return Promise
