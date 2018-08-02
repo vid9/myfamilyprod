@@ -45,6 +45,12 @@ let color = {"5a785125e7c9722aa0e1e8ac": "#97EBED" ,
 "5b34a331e6512b13c0889d93": "#ffb8ff",
 "5a785178900a3b278c196667":  "#A5D8F3"}
 
+let predlogIme = ["Skupna večerja","Izlet na morje", "Nakup šolskih potrebščin"];
+let predlogTock = [100, 50, 40];
+let predlogOpis = ["Dedek in babica bosta pripravila večerjo za vso družino",
+"Na lep sončen dan se bomo odpravili na morje. Zjutraj bomo plavali v kopru, popoldan pa šli z ladjico po Piranskem zalivu. Izlet bomo zaključili s sprehodom ob morju.",
+"Bliža se začetek šole. V petek bomo šli v trgovine in kupili učbenike, delovne zvezke in druge šolske pripomočke za naslednje šolsko leto."];
+
 //let color = { "5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5aeabcd8be609116280b4d9c": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3", "5aef78ab361f5244948ff58f": "#a3f7bf" };
 let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
@@ -192,8 +198,9 @@ module.exports.naslovnaStran = function (req, res) {
             if (vcilj) opomnik[i].vezan_cilj = vcilj.ime;
         }
         posodobiJson(obj, req.session);
+        let predlogNumber = getRandomInt(3);
         //console.log(req.session.trenutniUporabnik.notf_email," status mail");
-        res.render("pages/index", { uporabniki: result.uporabniki, currSession: req.session, cilji: result.cilji, kategorija: result.kategorija, id: req.session.trenutniUporabnik.id, opomniki: opomnik, skupniCilji: sCilji, moment: moment });
+        res.render("pages/index", { uporabniki: result.uporabniki, currSession: req.session, cilji: result.cilji, kategorija: result.kategorija, id: req.session.trenutniUporabnik.id, opomniki: opomnik, skupniCilji: sCilji, moment: moment, predlogIme: predlogIme[predlogNumber], predlogOpis: predlogOpis[predlogNumber], predlogTock: predlogTock[predlogNumber] });
     });
 };
 
@@ -1196,3 +1203,7 @@ function sendSms(naloga, users, avtor) {
         console.log("smsSent");
     });
 }
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+  }
