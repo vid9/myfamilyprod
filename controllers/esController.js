@@ -202,7 +202,7 @@ module.exports.naslovnaStran = function (req, res) {
             if (vcilj) opomnik[i].vezan_cilj = vcilj.ime;
         }
         posodobiJson(obj, req.session);
-        let predlogNumber = getRandomInt(3);
+        let predlogNumber = getRandomInt(6);
         //console.log(req.session.trenutniUporabnik.notf_email," status mail");
         res.render("pages/index", { uporabniki: result.uporabniki, currSession: req.session, cilji: result.cilji, kategorija: result.kategorija, id: req.session.trenutniUporabnik.id, opomniki: opomnik, skupniCilji: sCilji, moment: moment, predlogIme: predlogIme[predlogNumber], predlogOpis: predlogOpis[predlogNumber], predlogTock: predlogTock[predlogNumber] });
     });
