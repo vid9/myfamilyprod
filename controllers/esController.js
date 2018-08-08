@@ -51,7 +51,7 @@ let predlogOpis = ["Dedek in babica bosta pripravila večerjo za vso družino.",
 "Na lep sončen dan se bomo odpravili na morje. Zjutraj bomo plavali v Kopru, popoldan pa pluli z ladjico po Piranskem zalivu. Izlet bomo zaključili s sprehodom ob morju, kjer bomo tudi opazovali sončni zahod.",
 "Bliža se začetek šole. V petek bomo šli v trgovino in kupili učbenike, delovne zvezke in druge šolske pripomočke za naslednje šolsko leto.",
 "V zadnjih dneh je bilo zelo vroče. Dežja še nekaj dni ne bo, zato je potrebno zaliti vrt.",
-"Da si bomo lahko lažje dodeljevali naloge in jih skupaj reševali moramo v aplikaciji biti prisotni vsi. V aplikacijo povabi še preostale člane družine.",
+"Da si bomo lahko lažje dodeljevali naloge in jih skupaj reševali, moramo v aplikaciji biti prisotni vsi. V aplikacijo povabi še preostale člane družine.",
 "Avtomobil je zelo umazan in je potreben temeljitega čiščenja. Otroci ja bodo očistili odznotraj, oče pa ga bo očistil odzunaj.",
 ];
 

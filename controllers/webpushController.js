@@ -250,28 +250,28 @@ module.exports.prejmiNalogo = function (req, res) {
         status: true,
       };
       let conditions = { _id: req.params.idNaloge };
-    Naloge.findOneAndUpdate(conditions, novaNaloga, { upsert: true,new: true, runVlidators: true}, function (err, doc) { // callback
-      if (err) {
-          console.log(err);
-          return res.status(400).send("Pri shranjevanju naloge je prišlo do napake!");
-      } else {   
-        let updt, upXp;
-        if (doc) {
-          updt = doc.vezani_uporabniki;
-          upXp = doc.xp;
-        }
-        if (updt && upXp) {
-          Uporabnik.update({ _id: { $in: updt } }, { $inc: { dayXp: upXp } }, { multi: true }, function (err, docs) {
-              if (err) {
-                  console.log(err);
-                  return res.status(400).send("Pri shranjevanju točk je prišlo do napake!");
-              }
-          });
-        }
+      Naloge.findOneAndUpdate(conditions, novaNaloga, { upsert: true,new: true, runVlidators: true}, function (err, doc) { // callback
+        if (err) {
+            console.log(err);
+            return res.status(400).send("Pri shranjevanju naloge je prišlo do napake!");
+        } else {   
+          let updt, upXp;
+          if (doc) {
+            updt = doc.vezani_uporabniki;
+            upXp = doc.xp;
+          }
+          if (updt && upXp) {
+            Uporabnik.update({ _id: { $in: updt } }, { $inc: { dayXp: upXp } }, { multi: true }, function (err, docs) {
+                if (err) {
+                    console.log(err);
+                    return res.status(400).send("Pri shranjevanju točk je prišlo do napake!");
+                }
+            });
+          }
           //Iščem cilj, pod katerega je bila dodana naloga, uporabnikom prištejem vrednost za naloge, ki so jih naredili
           let obj = {}, curObj = {};
-        Cilji.findOne({ _id: doc.vezan_cilj }, function (err, cilj) {
-          if (!err) {
+          Cilji.findOne({ _id: doc.vezan_cilj }, function (err, cilj) {
+            if (!err) {
               if(cilj && cilj.vezani_uporabniki != null) obj = cilj.vezani_uporabniki.map(value => String(value.id_user)); //Error
               if(doc.vezani_uporabniki) curObj = doc.vezani_uporabniki.map(value => String(value));
               for (let i = 0; i < curObj.length; i++) {
@@ -300,8 +300,7 @@ module.exports.prejmiNalogo = function (req, res) {
                     } else {
                       return res.status(200).send("Naloga je bila uspešno ustvarjena!");
                     }
-                }
-                else {
+                } else {
                   console.log(err);
                   return res.status(400).send("Pri shranjevanju naloge je prišlo do napake!");
                 }
@@ -312,11 +311,12 @@ module.exports.prejmiNalogo = function (req, res) {
             }
           });
         }
+        /*
         if (doc) {
           return res.status(200).send("Naloga je bila uspešno posodobljena!");
         } else {
           return res.status(200).send("Naloga je bila uspešno ustvarjena!");
-        }      
+        }    */  
       });
     });
   } else {
