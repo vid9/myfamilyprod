@@ -256,9 +256,11 @@ module.exports.prejmiNalogo = function (req, res) {
             return res.status(400).send("Pri shranjevanju naloge je prišlo do napake!");
         } else {   
           let updt, upXp;
+          console.log(doc);
           if (doc) {
             updt = doc.vezani_uporabniki;
             upXp = doc.xp;
+            console.log(updt,upXp);
             Uporabnik.update({ _id: { $in: updt } }, { $inc: { dayXp: upXp } }, { multi: true }, function (err, docs) {
                 if (err) {
                     console.log(err);
