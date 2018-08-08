@@ -52,7 +52,7 @@ let predlogOpis = ["Dedek in babica bosta pripravila večerjo za vso družino.",
 "Bliža se začetek šole. V petek bomo šli v trgovino in kupili učbenike, delovne zvezke in druge šolske pripomočke za naslednje šolsko leto.",
 "V zadnjih dneh je bilo zelo vroče. Dežja še nekaj dni ne bo, zato je potrebno zaliti vrt.",
 "Da si bomo lahko lažje dodeljevali naloge in jih skupaj reševali, moramo v aplikaciji biti prisotni vsi. V aplikacijo povabi še preostale člane družine.",
-"Avtomobil je zelo umazan in je potreben temeljitega čiščenja. Otroci ja bodo očistili odznotraj, oče pa ga bo očistil odzunaj.",
+"Avtomobil je zelo umazan in je potreben temeljitega čiščenja. Otroci ga bodo očistili odznotraj, oče pa ga bo očistil odzunaj.",
 ];
 
 //let color = { "5a78505d19ac7744c8175d18": "#FEC3BF", "5a785125e7c9722aa0e1e8ac": "#FFDDB9", "5aeabcd8be609116280b4d9c": "#97EBED", "5a785178900a3b278c196667": "#A5D8F3", "5aef78ab361f5244948ff58f": "#a3f7bf" };

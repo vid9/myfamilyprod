@@ -199,6 +199,7 @@ module.exports.prejmiKorake = function (req, res) {
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
       if (err) return res.status(401).send({ auth: false, message: 'Failed to authenticate token.' });
+      console.log(req.body);
       Koraki.find(function (err) {
         if (err) {
           console.log(err);
@@ -213,9 +214,21 @@ module.exports.prejmiKorake = function (req, res) {
   }
 };
 
+//** GET /api/get_koraki/
+module.exports.posljiKorake = function (req, res) {
+  Koraki.find(req.session.trenutniUporabnik.druzina, function(err, koraki) {
+    let sum = [];
+    for(let i=0;i<Object.keys(koraki).length;i++) {
+      for(let j=0;j<Object.keys(koraki).length;j++) {
+        sum[i] += koraki[j].koraki[i];
+      }
+    }
+  });
+  return res.status(200).send(sum);
+}
+
 //** GET /api/druzina/:druzinaId
 module.exports.posljiDruzino = function (req, res) {
-  
   let token = req.headers.token;
   if (token) {
     jwt.verify(token, config.secret, function(err, decoded) {
