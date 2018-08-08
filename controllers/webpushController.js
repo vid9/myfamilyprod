@@ -250,7 +250,7 @@ module.exports.prejmiNalogo = function (req, res) {
         status: true,
       };
       let conditions = { _id: req.params.idNaloge };
-      Naloge.findOneAndUpdate(conditions, novaNaloga, { upsert: true,new: true, runVlidators: true}, function (err, doc) { // callback
+      Naloge.findOneAndUpdate(conditions, novaNaloga, { upsert: true, runVlidators: true}, function (err, doc) { // callback
         if (err) {
             console.log(err);
             return res.status(400).send("Pri shranjevanju naloge je prišlo do napake!");
